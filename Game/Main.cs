@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using Godot;
 
 namespace PuzzleCourse.Game;
 
-public partial class Main : Node2D
+public partial class Main : Node
 {
     private const float PixelSize = 64;
 
@@ -12,6 +13,7 @@ public partial class Main : Node2D
     private TileMapLayer _highlightTileMapLayer;
 
     private Vector2? _hoveredGridCell;
+    private HashSet<Vector2> _occupiedCells = [];
 
     public override void _Ready()
     {
@@ -30,22 +32,24 @@ public partial class Main : Node2D
         var gridPos = GetMouseGridCellPosition;
         _cursor.Position = gridPos * PixelSize;
 
-        if (IsPlacingBuilding(gridPos))
-        {
-            _hoveredGridCell = gridPos;
-            UpdateHighlightTileMapLayer();
-        }
+        if (!IsPlacingBuilding(gridPos)) return;
+
+        _hoveredGridCell = gridPos;
+        UpdateHighlightTileMapLayer();
     }
 
     private bool IsPlacingBuilding(Vector2 gridPosition) =>
         _cursor.Visible && (!_hoveredGridCell.HasValue || _hoveredGridCell.Value != gridPosition);
 
-    private bool CanPlaceBuilding(InputEvent @event) => _cursor.Visible && @event.IsActionPressed("left_click");
+    private bool CanPlaceBuilding(InputEvent @event) =>
+        @event.IsActionPressed("left_click")
+        && _hoveredGridCell.HasValue
+        && !_occupiedCells.Contains(_hoveredGridCell.Value);
 
     private void UpdateHighlightTileMapLayer()
     {
         _highlightTileMapLayer.Clear();
-        
+
         if (!_hoveredGridCell.HasValue) return;
 
         for (var x = _hoveredGridCell.Value.X - 3; x <= _hoveredGridCell.Value.X + 3; x++)
@@ -65,27 +69,25 @@ public partial class Main : Node2D
     {
         if (!CanPlaceBuilding(@event)) return;
 
-        PlaceBuildingAtMousePosition();
+        PlaceBuildingAtHoveredCellPosition();
         _cursor.Visible = false;
     }
 
-    private Vector2 GetMouseGridCellPosition => (GetGlobalMousePosition() / PixelSize).Floor();
+    private Vector2 GetMouseGridCellPosition => (_highlightTileMapLayer.GetGlobalMousePosition() / PixelSize).Floor();
 
-    private void PlaceBuildingAtMousePosition()
+    private void PlaceBuildingAtHoveredCellPosition()
     {
+        if (!_hoveredGridCell.HasValue) return;
+
         var building = _buildingScene.Instantiate<Node2D>();
-        
         AddChild(building);
 
-        building.GlobalPosition = GetMouseGridCellPosition * PixelSize;
+        building.GlobalPosition = _hoveredGridCell.Value * PixelSize;
+        _occupiedCells.Add(_hoveredGridCell.Value);
 
         _hoveredGridCell = null;
-        
         UpdateHighlightTileMapLayer();
     }
 
-    private void OnButtonPressed()
-    {
-        _cursor.Visible = true;
-    }
+    private void OnButtonPressed() => _cursor.Visible = true;
 }
