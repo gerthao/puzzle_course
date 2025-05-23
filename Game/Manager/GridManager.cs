@@ -18,25 +18,23 @@ public partial class GridManager : Node
     {
         GameEvents.Instance.BuildingPlaced += UpdateValidBuildableTiles;
     }
-    
+
     private void UpdateValidBuildableTiles(BuildingComponent component)
     {
         var rootCell = component.GetGridCellPosition();
         var radius = component.BuildableRadius;
-        
-        for (var x = rootCell.X - radius; x <= rootCell.X + radius; x++)
-        for (var y = rootCell.Y - radius; y <= rootCell.Y + radius; y++)
-        {
-            var v = new Vector2I(x, y);
+        var validTiles = GetValidTilesInRadius(rootCell, radius);
 
-            if (!HasBuildableProperty(v))
-                continue;
-            
-            _validBuildableTiles.Add(v);
-        }
-        
-        _validBuildableTiles.Remove(component.GetGridCellPosition());
+        _validBuildableTiles.UnionWith(validTiles);
+        _validBuildableTiles.ExceptWith(GetOccupiedTiles());
     }
+
+    private IEnumerable<Vector2I> GetOccupiedTiles() =>
+        GetTree()
+            .GetNodesInGroup(nameof(BuildingComponent))
+            .Cast<BuildingComponent>()
+            .Select(bc => bc.GetGridCellPosition());
+
 
     private bool HasBuildableProperty(Vector2I tilePosition) =>
         (_baseTerrainTileMapLayer
@@ -44,15 +42,30 @@ public partial class GridManager : Node
             ?.GetCustomData("buildable")
             .AsBool()
         ).GetValueOrDefault(false);
-    
+
     public bool IsTilePositionBuildable(Vector2I tilePosition) =>
         _validBuildableTiles.Contains(tilePosition);
-    
 
-    public void HighlightBuildableTiles()
+    public void HighlightBuildRadiusOfIntendedTile(Vector2I tilePosition, int radius)
     {
-        foreach (var tilePosition in _validBuildableTiles) 
-            _highlightTileMapLayer.SetCell(tilePosition, 0, Vector2I.Zero);
+        ClearHighlightTileMapLayer();
+
+        var validTiles = GetValidTilesInRadius(tilePosition, radius).ToHashSet();
+        var expandedTiles = validTiles
+            .Except(_validBuildableTiles)
+            .Except(GetOccupiedTiles());
+        var atlasCoord = new Vector2I(1, 0);
+
+        HighlightBuildRadiiOfOccupiedTiles();
+
+        foreach (var t in expandedTiles)
+            _highlightTileMapLayer.SetCell(t, 0, atlasCoord);
+    }
+
+    public void HighlightBuildRadiiOfOccupiedTiles()
+    {
+        foreach (var t in _validBuildableTiles)
+            _highlightTileMapLayer.SetCell(t, 0, Vector2I.Zero);
     }
 
     public void ClearHighlightTileMapLayer() =>
@@ -63,5 +76,23 @@ public partial class GridManager : Node
         var (x, y) = (_highlightTileMapLayer.GetGlobalMousePosition() / Grid.CellPixelSize).Floor();
 
         return new Vector2I((int)x, (int)y);
+    }
+
+    private List<Vector2I> GetValidTilesInRadius(Vector2I tilePosition, int radius)
+    {
+        List<Vector2I> result = [];
+
+        for (var x = tilePosition.X - radius; x <= tilePosition.X + radius; x++)
+        for (var y = tilePosition.Y - radius; y <= tilePosition.Y + radius; y++)
+        {
+            var v = new Vector2I(x, y);
+
+            if (!HasBuildableProperty(v))
+                continue;
+
+            result.Add(v);
+        }
+
+        return result;
     }
 }

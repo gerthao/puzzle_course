@@ -32,7 +32,7 @@ public partial class Main : Node
         if (!IsPlacingBuilding(currentGridCellPosition)) return;
 
         _hoveredGridCell = currentGridCellPosition;
-        _gridManager.HighlightBuildableTiles();
+        _gridManager.HighlightBuildRadiusOfIntendedTile(_hoveredGridCell.Value, 3);
     }
 
     private bool IsPlacingBuilding(Vector2I gridPosition) =>
@@ -65,5 +65,9 @@ public partial class Main : Node
         _gridManager.ClearHighlightTileMapLayer();
     }
 
-    private void OnButtonPressed() => _cursor.Visible = true;
+    private void OnButtonPressed()
+    {
+        _cursor.Visible = true;
+        _gridManager.HighlightBuildRadiiOfOccupiedTiles();
+    }
 }
