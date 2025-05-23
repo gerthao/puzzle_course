@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Godot;
 using PuzzleCourse.Game.Manager;
 
@@ -11,14 +10,14 @@ public partial class Main : Node
     private Button _placeBuildingButton;
     private GridManager _gridManager;
 
-    private Vector2? _hoveredGridCell;
+    private Vector2I? _hoveredGridCell;
 
     public override void _Ready()
     {
         _cursor              = GetNode<Sprite2D>("Cursor");
-        _buildingScene       = GD.Load<PackedScene>("res://Game/Building/Building.tscn");
         _placeBuildingButton = GetNode<Button>("PlaceBuildingButton");
         _gridManager         = GetNode<GridManager>("GridManager");
+        _buildingScene       = GD.Load<PackedScene>("res://Game/Building/Building.tscn");
 
         _cursor.Visible = false;
 
@@ -27,16 +26,16 @@ public partial class Main : Node
 
     public override void _Process(double delta)
     {
-        var gridPos = _gridManager.GetMouseGridCellPosition;
-        _cursor.Position = gridPos * GridManager.PixelSize;
+        var gridPos = _gridManager.GetMouseGridCellPosition();
+        _cursor.Position = gridPos * Grid.CellPixelSize;
 
         if (!IsPlacingBuilding(gridPos)) return;
 
         _hoveredGridCell = gridPos;
-        _gridManager.HighlightValidTilesInRadius(_hoveredGridCell.Value, 3);
+        _gridManager.HighlightBuildableTiles();
     }
 
-    private bool IsPlacingBuilding(Vector2 gridPosition) =>
+    private bool IsPlacingBuilding(Vector2I gridPosition) =>
         _cursor.Visible && (!_hoveredGridCell.HasValue || _hoveredGridCell.Value != gridPosition);
 
     private bool CanPlaceBuilding(InputEvent @event) =>
@@ -61,10 +60,10 @@ public partial class Main : Node
         var building = _buildingScene.Instantiate<Node2D>();
         AddChild(building);
 
-        building.GlobalPosition = _hoveredGridCell.Value * GridManager.PixelSize;
-        
-        _gridManager.MarkTileAsOccupied(_hoveredGridCell.Value);
-        
+        building.GlobalPosition = _hoveredGridCell.Value * Grid.CellPixelSize;
+
+        _gridManager.MarkTileAsOccupied(_hoveredGridCell.Value) ;
+
 
         _hoveredGridCell = null;
         _gridManager.ClearHighlightTileMapLayer();
