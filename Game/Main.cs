@@ -26,12 +26,12 @@ public partial class Main : Node
 
     public override void _Process(double delta)
     {
-        var gridPos = _gridManager.GetMouseGridCellPosition();
-        _cursor.Position = gridPos * Grid.CellPixelSize;
+        var currentGridCellPosition = _gridManager.GetMouseGridCellPosition();
+        _cursor.Position = currentGridCellPosition * Grid.CellPixelSize;
 
-        if (!IsPlacingBuilding(gridPos)) return;
+        if (!IsPlacingBuilding(currentGridCellPosition)) return;
 
-        _hoveredGridCell = gridPos;
+        _hoveredGridCell = currentGridCellPosition;
         _gridManager.HighlightBuildableTiles();
     }
 
@@ -41,7 +41,7 @@ public partial class Main : Node
     private bool CanPlaceBuilding(InputEvent @event) =>
         @event.IsActionPressed("left_click")
         && _hoveredGridCell.HasValue
-        && _gridManager.IsTilePositionValid(_hoveredGridCell.Value);
+        && _gridManager.IsTilePositionBuildable(_hoveredGridCell.Value);
 
 
     public override void _UnhandledInput(InputEvent @event)
@@ -58,12 +58,8 @@ public partial class Main : Node
         if (!_hoveredGridCell.HasValue) return;
 
         var building = _buildingScene.Instantiate<Node2D>();
-        AddChild(building);
-
         building.GlobalPosition = _hoveredGridCell.Value * Grid.CellPixelSize;
-
-        _gridManager.MarkTileAsOccupied(_hoveredGridCell.Value) ;
-
+        AddChild(building);
 
         _hoveredGridCell = null;
         _gridManager.ClearHighlightTileMapLayer();
