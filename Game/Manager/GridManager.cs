@@ -13,10 +13,28 @@ public partial class GridManager : Node
     [Export] private TileMapLayer _baseTerrainTileMapLayer;
 
     private HashSet<Vector2I> _validBuildableTiles = [];
+    private List<TileMapLayer> _allTileMapLayers = [];
 
     public override void _Ready()
     {
         GameEvents.Instance.BuildingPlaced += UpdateValidBuildableTiles;
+        _allTileMapLayers                  =  GetAllTileMapLayers(_baseTerrainTileMapLayer);
+    }
+
+    private List<TileMapLayer> GetAllTileMapLayers(TileMapLayer layer, List<TileMapLayer> accumulator = null)
+    {
+        accumulator ??= [];
+        
+        var childLayers = layer.GetChildren()
+            .OfType<TileMapLayer>()
+            .Reverse();
+        
+        foreach (var l in childLayers)
+            GetAllTileMapLayers(l, accumulator);
+
+        accumulator.Add(layer);
+        
+        return accumulator;
     }
 
     private void UpdateValidBuildableTiles(BuildingComponent component)
@@ -37,13 +55,15 @@ public partial class GridManager : Node
 
 
     private bool HasBuildableProperty(Vector2I tilePosition) =>
-        (_baseTerrainTileMapLayer
-            ?.GetCellTileData(tilePosition)
-            ?.GetCustomData("buildable")
-            .AsBool()
-        ).GetValueOrDefault(false);
+        (from layer in _allTileMapLayers
+            select layer?.GetCellTileData(tilePosition)
+                ?.GetCustomData("buildable")
+                .AsBool()
+            into maybeBuildable
+            where maybeBuildable != null
+            select maybeBuildable == true).FirstOrDefault();
 
-    public bool IsTilePositionBuildable(Vector2I tilePosition) =>
+    public bool IsWithinValidBuildArea(Vector2I tilePosition) =>
         _validBuildableTiles.Contains(tilePosition);
 
     public void HighlightBuildRadiusOfIntendedTile(Vector2I tilePosition, int radius)

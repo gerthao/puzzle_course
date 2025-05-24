@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 using PuzzleCourse.Game.Manager;
 
@@ -9,7 +10,6 @@ public partial class Main : Node
     private PackedScene _buildingScene;
     private Button _placeBuildingButton;
     private GridManager _gridManager;
-
     private Vector2I? _hoveredGridCell;
 
     public override void _Ready()
@@ -41,7 +41,7 @@ public partial class Main : Node
     private bool CanPlaceBuilding(InputEvent @event) =>
         @event.IsActionPressed("left_click")
         && _hoveredGridCell.HasValue
-        && _gridManager.IsTilePositionBuildable(_hoveredGridCell.Value);
+        && _gridManager.IsWithinValidBuildArea(_hoveredGridCell.Value);
 
 
     public override void _UnhandledInput(InputEvent @event)
