@@ -1,27 +1,36 @@
 using System.Collections.Generic;
 using Godot;
 using PuzzleCourse.Game.Manager;
+using PuzzleCourse.Resources.Building;
 
 namespace PuzzleCourse.Game;
 
 public partial class Main : Node
 {
-    private Sprite2D _cursor;
-    private PackedScene _buildingScene;
-    private Button _placeBuildingButton;
-    private GridManager _gridManager;
-    private Vector2I? _hoveredGridCell;
+    private Sprite2D         _cursor;
+    private BuildingResource _towerResource;
+    private BuildingResource _villageResource;
+    private Button           _placeTowerButton;
+    private Button           _placeVillageButton;
+    private GridManager      _gridManager;
+    private Vector2I?        _hoveredGridCell;
+    private Node2D           _ySortRoot;
+    private BuildingResource _toPlaceBuildingResource;
 
     public override void _Ready()
     {
-        _cursor              = GetNode<Sprite2D>("Cursor");
-        _placeBuildingButton = GetNode<Button>("PlaceBuildingButton");
-        _gridManager         = GetNode<GridManager>("GridManager");
-        _buildingScene       = GD.Load<PackedScene>("res://Game/Building/Building.tscn");
+        _cursor             = GetNode<Sprite2D>("Cursor");
+        _placeTowerButton   = GetNode<Button>("PlaceTowerButton");
+        _placeVillageButton = GetNode<Button>("PlaceVillageButton");
+        _gridManager        = GetNode<GridManager>("GridManager");
+        _ySortRoot          = GetNode<Node2D>("YSortRoot");
+        _towerResource      = GD.Load<BuildingResource>("res://Resources/Building/Tower.tres");
+        _villageResource   = GD.Load<BuildingResource>("res://Resources/Building/Village.tres");
 
         _cursor.Visible = false;
 
-        _placeBuildingButton.Pressed += OnButtonPressed;
+        _placeTowerButton.Pressed   += OnPlaceTowerButtonPressed;
+        _placeVillageButton.Pressed += OnPlaceVillageButtonPressed;
     }
 
     public override void _Process(double delta)
@@ -29,10 +38,11 @@ public partial class Main : Node
         var currentGridCellPosition = _gridManager.GetMouseGridCellPosition();
         _cursor.Position = currentGridCellPosition * Grid.CellPixelSize;
 
-        if (!IsPlacingBuilding(currentGridCellPosition)) return;
+        if (_toPlaceBuildingResource == null || !IsPlacingBuilding(currentGridCellPosition)) return;
 
         _hoveredGridCell = currentGridCellPosition;
-        _gridManager.HighlightBuildRadiusOfIntendedTile(_hoveredGridCell.Value, 3);
+        _gridManager.HighlightBuildRadiusOfIntendedTile(_hoveredGridCell.Value,
+            _toPlaceBuildingResource.BuildableRadius);
     }
 
     private bool IsPlacingBuilding(Vector2I gridPosition) =>
@@ -57,17 +67,28 @@ public partial class Main : Node
     {
         if (!_hoveredGridCell.HasValue) return;
 
-        var building = _buildingScene.Instantiate<Node2D>();
+        var building = _toPlaceBuildingResource.BuildingScene.Instantiate<Node2D>();
         building.GlobalPosition = _hoveredGridCell.Value * Grid.CellPixelSize;
-        AddChild(building);
+
+        _ySortRoot.AddChild(building);
 
         _hoveredGridCell = null;
         _gridManager.ClearHighlightTileMapLayer();
     }
 
-    private void OnButtonPressed()
+    private void OnPlaceTowerButtonPressed()
     {
-        _cursor.Visible = true;
+        _toPlaceBuildingResource = _towerResource;
+        _cursor.Visible          = true;
+
+        _gridManager.HighlightBuildRadiiOfOccupiedTiles();
+    }
+
+    private void OnPlaceVillageButtonPressed()
+    {
+        _toPlaceBuildingResource = _villageResource;
+        _cursor.Visible          = true;
+
         _gridManager.HighlightBuildRadiiOfOccupiedTiles();
     }
 }

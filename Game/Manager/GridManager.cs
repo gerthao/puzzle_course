@@ -12,8 +12,8 @@ public partial class GridManager : Node
     [Export] private TileMapLayer _highlightTileMapLayer;
     [Export] private TileMapLayer _baseTerrainTileMapLayer;
 
-    private HashSet<Vector2I> _validBuildableTiles = [];
-    private List<TileMapLayer> _allTileMapLayers = [];
+    private readonly HashSet<Vector2I>  _validBuildableTiles = [];
+    private          List<TileMapLayer> _allTileMapLayers    = [];
 
     public override void _Ready()
     {
@@ -24,23 +24,23 @@ public partial class GridManager : Node
     private List<TileMapLayer> GetAllTileMapLayers(TileMapLayer layer, List<TileMapLayer> accumulator = null)
     {
         accumulator ??= [];
-        
+
         var childLayers = layer.GetChildren()
             .OfType<TileMapLayer>()
             .Reverse();
-        
+
         foreach (var l in childLayers)
             GetAllTileMapLayers(l, accumulator);
 
         accumulator.Add(layer);
-        
+
         return accumulator;
     }
 
     private void UpdateValidBuildableTiles(BuildingComponent component)
     {
-        var rootCell = component.GetGridCellPosition();
-        var radius = component.BuildableRadius;
+        var rootCell   = component.GetGridCellPosition();
+        var radius     = component.BuildingResource.BuildableRadius;
         var validTiles = GetValidTilesInRadius(rootCell, radius);
 
         _validBuildableTiles.UnionWith(validTiles);
@@ -56,7 +56,8 @@ public partial class GridManager : Node
 
     private bool HasBuildableProperty(Vector2I tilePosition) =>
         (from layer in _allTileMapLayers
-            select layer?.GetCellTileData(tilePosition)
+            select layer
+                ?.GetCellTileData(tilePosition)
                 ?.GetCustomData("buildable")
                 .AsBool()
             into maybeBuildable
