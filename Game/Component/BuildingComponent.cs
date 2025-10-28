@@ -6,18 +6,16 @@ namespace PuzzleCourse.Game.Component;
 
 public partial class BuildingComponent : Node2D
 {
-
-    [Export(PropertyHint.File, "*.tres")] private string _buildingResourcePath;
+    [Export(PropertyHint.File, "*.tres")]
+    private string _buildingResourcePath;
 
     public BuildingResource BuildingResource { get; private set; }
-    
+
     public override void _Ready()
     {
         if (_buildingResourcePath != null)
-        {
             BuildingResource = GD.Load<BuildingResource>(_buildingResourcePath);
-        }
-        
+
         AddToGroup(nameof(BuildingComponent));
 
         Callable
