@@ -27,11 +27,11 @@ public partial class Main : Node
 
         _gridManager.ClearHighlightTileMapLayer();
 
-        _gridManager.HighlightBuildRadiusOfIntendedBuildableTile(
+        _gridManager.HighlightPotentialTilesForBuildings(
             _hoveredGridCell.Value,
             _toPlaceBuildingResource.BuildableRadius);
 
-        _gridManager.HighlightBuildRadiusOfIntendedResourceTile(
+        _gridManager.HighlightResourceTiles(
             _hoveredGridCell.Value,
             _toPlaceBuildingResource.ResourceRadius);
     }
@@ -49,8 +49,9 @@ public partial class Main : Node
 
         _cursor.Visible = false;
 
-        _placeTowerButton.Pressed   += OnPlaceTowerButtonPressed;
-        _placeVillageButton.Pressed += OnPlaceVillageButtonPressed;
+        _placeTowerButton.Pressed         += OnPlaceTowerButtonPressed;
+        _placeVillageButton.Pressed       += OnPlaceVillageButtonPressed;
+        _gridManager.ResourceTilesUpdated += OnResourceTilesUpdated;
     }
 
 
@@ -84,6 +85,11 @@ public partial class Main : Node
         _cursor.Visible          = true;
 
         _gridManager.HighlightBuildRadiusOfOccupiedTiles();
+    }
+
+    private void OnResourceTilesUpdated(int resourceCount)
+    {
+        GD.Print($"Resource count: {resourceCount}");
     }
 
 
