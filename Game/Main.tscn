@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=4 uid="uid://b8u1dg7t55223"]
+[gd_scene load_steps=8 format=4 uid="uid://b8u1dg7t55223"]
 
 [ext_resource type="Script" uid="uid://c6xtbsgdneneo" path="res://Game/Main.cs" id="1_wd0a0"]
 [ext_resource type="TileSet" uid="uid://brk8dkdo6374l" path="res://Resources/HighlightTileset.tres" id="2_lv82p"]
 [ext_resource type="Script" uid="uid://r0uytgnccyfp" path="res://Game/Manager/GridManager.cs" id="2_rchnd"]
 [ext_resource type="TileSet" uid="uid://c4ej0bmhxgsqe" path="res://Resources/Tiles.tres" id="2_w1egk"]
 [ext_resource type="PackedScene" uid="uid://cfyou568vwqg3" path="res://Game/Building/Base.tscn" id="5_rl4yr"]
+[ext_resource type="PackedScene" uid="uid://doksfogr625qu" path="res://Scenes/UI/GameUI.tscn" id="6_g5pn2"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_r150o"]
 size = Vector2(64, 64)
@@ -12,10 +13,10 @@ size = Vector2(64, 64)
 [node name="Main" type="Node"]
 script = ExtResource("1_wd0a0")
 
-[node name="GridManager" type="Node" parent="." node_paths=PackedStringArray("_highlightTileMapLayer", "_baseTerrainTileMapLayer")]
+[node name="GridManager" type="Node" parent="." node_paths=PackedStringArray("_baseTerrainTileMapLayer", "_highlightTileMapLayer")]
 script = ExtResource("2_rchnd")
-_highlightTileMapLayer = NodePath("../HighlightTileMapLayer")
 _baseTerrainTileMapLayer = NodePath("../YSortRoot/BaseTerrainTileMapLayer")
+_highlightTileMapLayer = NodePath("../HighlightTileMapLayer")
 metadata/_custom_type_script = "uid://r0uytgnccyfp"
 
 [node name="YSortRoot" type="Node2D" parent="."]
@@ -42,16 +43,4 @@ tile_set = ExtResource("2_lv82p")
 texture = SubResource("PlaceholderTexture2D_r150o")
 centered = false
 
-[node name="PlaceTowerButton" type="Button" parent="."]
-offset_left = 4.0
-offset_top = 685.0
-offset_right = 121.0
-offset_bottom = 716.0
-text = "Place Tower"
-
-[node name="PlaceVillageButton" type="Button" parent="."]
-offset_left = 125.0
-offset_top = 685.0
-offset_right = 242.0
-offset_bottom = 716.0
-text = "Place Village"
+[node name="GameUI" parent="." instance=ExtResource("6_g5pn2")]

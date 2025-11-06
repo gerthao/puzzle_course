@@ -1,16 +1,16 @@
 using Godot;
 using PuzzleCourse.Game.Manager;
 using PuzzleCourse.Resources.Building;
+using PuzzleCourse.Scenes.UI;
 
 namespace PuzzleCourse.Game;
 
 public partial class Main : Node
 {
     private Sprite2D _cursor;
+    private GameUI _gameUI;
     private GridManager _gridManager;
     private Vector2I? _hoveredGridCell;
-    private Button _placeTowerButton;
-    private Button _placeVillageButton;
     private BuildingResource _toPlaceBuildingResource;
     private BuildingResource _towerResource;
     private BuildingResource _villageResource;
@@ -38,22 +38,20 @@ public partial class Main : Node
 
     public override void _Ready()
     {
-        _cursor             = GetNode<Sprite2D>("Cursor");
-        _placeTowerButton   = GetNode<Button>("PlaceTowerButton");
-        _placeVillageButton = GetNode<Button>("PlaceVillageButton");
-        _gridManager        = GetNode<GridManager>("GridManager");
-        _ySortRoot          = GetNode<Node2D>("YSortRoot");
+        _cursor      = GetNode<Sprite2D>("Cursor");
+        _gridManager = GetNode<GridManager>("GridManager");
+        _ySortRoot   = GetNode<Node2D>("YSortRoot");
+        _gameUI      = GetNode<GameUI>("GameUI");
 
         _towerResource   = GD.Load<BuildingResource>("res://Resources/Building/Tower.tres");
         _villageResource = GD.Load<BuildingResource>("res://Resources/Building/Village.tres");
 
         _cursor.Visible = false;
 
-        _placeTowerButton.Pressed         += OnPlaceTowerButtonPressed;
-        _placeVillageButton.Pressed       += OnPlaceVillageButtonPressed;
         _gridManager.ResourceTilesUpdated += OnResourceTilesUpdated;
+        _gameUI.PlaceTowerButtonPressed   += OnPlaceTowerButtonPressed;
+        _gameUI.PlaceVillageButtonPressed += OnPlaceVillageButtonPressed;
     }
-
 
     public override void _UnhandledInput(InputEvent @event)
     {
