@@ -1,35 +1,35 @@
 using Godot;
+using PuzzleCourse.Resources.Building;
 
 namespace PuzzleCourse.Scenes.UI;
 
 public partial class GameUI : MarginContainer
 {
     [Signal]
-    public delegate void PlaceTowerButtonPressedEventHandler();
+    public delegate void BuildingResourceSelectedEventHandler(BuildingResource resource);
 
-    [Signal]
-    public delegate void PlaceVillageButtonPressedEventHandler();
+    [Export]
+    private BuildingResource[] _buildingResources;
 
-    private Button _placeTowerButton;
-
-    private Button _placeVillageButton;
+    private HBoxContainer _hBoxContainer;
 
     public override void _Ready()
     {
-        _placeTowerButton   = GetNode<Button>("%PlaceTowerButton");
-        _placeVillageButton = GetNode<Button>("%PlaceVillageButton");
+        _hBoxContainer = GetNode<HBoxContainer>("HBoxContainer");
 
-        _placeTowerButton.Pressed   += OnPlaceTowerButtonPressed;
-        _placeVillageButton.Pressed += OnPlaceVillageButtonPressed;
+        InitBuildingButtons();
     }
 
-    private void OnPlaceTowerButtonPressed()
+    private void InitBuildingButtons()
     {
-        EmitSignalPlaceTowerButtonPressed();
-    }
+        foreach (var resource in _buildingResources)
+        {
+            var buildingButton = new Button();
+            buildingButton.Text = $"Place {resource.DisplayName}";
 
-    private void OnPlaceVillageButtonPressed()
-    {
-        EmitSignalPlaceVillageButtonPressed();
+            buildingButton.Pressed += () => EmitSignalBuildingResourceSelected(resource);
+
+            _hBoxContainer.AddChild(buildingButton);
+        }
     }
 }

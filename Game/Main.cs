@@ -12,8 +12,6 @@ public partial class Main : Node
     private GridManager _gridManager;
     private Vector2I? _hoveredGridCell;
     private BuildingResource _toPlaceBuildingResource;
-    private BuildingResource _towerResource;
-    private BuildingResource _villageResource;
     private Node2D _ySortRoot;
 
     public override void _Process(double delta)
@@ -43,14 +41,10 @@ public partial class Main : Node
         _ySortRoot   = GetNode<Node2D>("YSortRoot");
         _gameUI      = GetNode<GameUI>("GameUI");
 
-        _towerResource   = GD.Load<BuildingResource>("res://Resources/Building/Tower.tres");
-        _villageResource = GD.Load<BuildingResource>("res://Resources/Building/Village.tres");
-
         _cursor.Visible = false;
 
         _gridManager.ResourceTilesUpdated += OnResourceTilesUpdated;
-        _gameUI.PlaceTowerButtonPressed   += OnPlaceTowerButtonPressed;
-        _gameUI.PlaceVillageButtonPressed += OnPlaceVillageButtonPressed;
+        _gameUI.BuildingResourceSelected  += OnPlaceBuildingResourceSelected;
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -69,17 +63,9 @@ public partial class Main : Node
     private bool IsPlacingBuilding(Vector2I gridPosition) =>
         _cursor.Visible && (!_hoveredGridCell.HasValue || _hoveredGridCell.Value != gridPosition);
 
-    private void OnPlaceTowerButtonPressed()
+    private void OnPlaceBuildingResourceSelected(BuildingResource resource)
     {
-        _toPlaceBuildingResource = _towerResource;
-        _cursor.Visible          = true;
-
-        _gridManager.HighlightBuildRadiusOfOccupiedTiles();
-    }
-
-    private void OnPlaceVillageButtonPressed()
-    {
-        _toPlaceBuildingResource = _villageResource;
+        _toPlaceBuildingResource = resource;
         _cursor.Visible          = true;
 
         _gridManager.HighlightBuildRadiusOfOccupiedTiles();
