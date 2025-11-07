@@ -44,20 +44,6 @@ public partial class GridManager : Node
         return new Vector2I((int)x, (int)y);
     }
 
-    // public void HighlightPotentialTilesForResource(Vector2I tilePosition, int radius)
-    // {
-    //     var validTiles = GetBuildableTileRegion(tilePosition, radius).ToHashSet();
-    //     var expandedTiles = validTiles
-    //         .Except(_validBuildableTiles)
-    //         .Except(GetOccupiedTiles());
-    //     var atlasCoord = new Vector2I(1, 0);
-    //
-    //     HighlightBuildRadiusOfOccupiedTiles();
-    //
-    //     foreach (var t in expandedTiles)
-    //         _highlightTileMapLayer.SetCell(t, 0, atlasCoord);
-    // }
-
 
     public void HighlightBuildRadiusOfOccupiedTiles()
     {

@@ -1,17 +1,24 @@
-[gd_scene load_steps=8 format=4 uid="uid://b8u1dg7t55223"]
+[gd_scene load_steps=9 format=4 uid="uid://b8u1dg7t55223"]
 
 [ext_resource type="Script" uid="uid://c6xtbsgdneneo" path="res://Game/Main.cs" id="1_wd0a0"]
+[ext_resource type="PackedScene" uid="uid://4lv48ibsgy3d" path="res://Game/Manager/BuildingManager.tscn" id="2_haytw"]
 [ext_resource type="TileSet" uid="uid://brk8dkdo6374l" path="res://Resources/HighlightTileset.tres" id="2_lv82p"]
 [ext_resource type="Script" uid="uid://r0uytgnccyfp" path="res://Game/Manager/GridManager.cs" id="2_rchnd"]
 [ext_resource type="TileSet" uid="uid://c4ej0bmhxgsqe" path="res://Resources/Tiles.tres" id="2_w1egk"]
 [ext_resource type="PackedScene" uid="uid://cfyou568vwqg3" path="res://Game/Building/Base.tscn" id="5_rl4yr"]
-[ext_resource type="PackedScene" uid="uid://doksfogr625qu" path="res://Scenes/UI/GameUI.tscn" id="6_g5pn2"]
+[ext_resource type="PackedScene" uid="uid://doksfogr625qu" path="res://Game/UI/GameUI.tscn" id="6_g5pn2"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_r150o"]
 size = Vector2(64, 64)
 
 [node name="Main" type="Node"]
 script = ExtResource("1_wd0a0")
+
+[node name="BuildingManager" parent="." node_paths=PackedStringArray("_cursor", "_gameUI", "_gridManager", "_ySortRoot") instance=ExtResource("2_haytw")]
+_cursor = NodePath("../Cursor")
+_gameUI = NodePath("../GameUI")
+_gridManager = NodePath("../GridManager")
+_ySortRoot = NodePath("../YSortRoot")
 
 [node name="GridManager" type="Node" parent="." node_paths=PackedStringArray("_baseTerrainTileMapLayer", "_highlightTileMapLayer")]
 script = ExtResource("2_rchnd")

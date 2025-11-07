@@ -1,7 +1,7 @@
 using Godot;
 using PuzzleCourse.Resources.Building;
 
-namespace PuzzleCourse.Scenes.UI;
+namespace PuzzleCourse.Game.UI;
 
 public partial class GameUI : MarginContainer
 {
@@ -17,10 +17,10 @@ public partial class GameUI : MarginContainer
     {
         _hBoxContainer = GetNode<HBoxContainer>("HBoxContainer");
 
-        InitBuildingButtons();
+        InitializeBuildingButtons();
     }
 
-    private void InitBuildingButtons()
+    private void InitializeBuildingButtons()
     {
         foreach (var resource in _buildingResources)
         {
