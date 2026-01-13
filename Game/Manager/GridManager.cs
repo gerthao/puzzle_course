@@ -59,7 +59,7 @@ public partial class GridManager : Node
             .Except(GetOccupiedTiles());
         var atlasCoord = new Vector2I(1, 0);
 
-        HighlightBuildRadiusOfOccupiedTiles();
+        // HighlightBuildRadiusOfOccupiedTiles();
 
         foreach (var t in expandedTiles)
             _highlightTileMapLayer.SetCell(t, 0, atlasCoord);

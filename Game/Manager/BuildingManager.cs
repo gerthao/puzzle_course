@@ -6,11 +6,13 @@ namespace PuzzleCourse.Game.Manager;
 
 public partial class BuildingManager : Node
 {
-    private int _currentlyUsedResourceCount;
-    private int _currentResourceCount;
+    private BuildingGhost _buildingGhost;
 
     [Export]
-    private Sprite2D _cursor;
+    private PackedScene _buildingGhostScene;
+
+    private int _currentlyUsedResourceCount;
+    private int _currentResourceCount;
 
     [Export]
     private GameUI _gameUI;
@@ -31,22 +33,17 @@ public partial class BuildingManager : Node
 
     public override void _Process(double delta)
     {
-        var currentGridCellPosition = _gridManager.GetMouseGridCellPosition();
-        _cursor.Position = currentGridCellPosition * Grid.CellPixelSize;
+        if (!IsInstanceValid(_buildingGhost)) return;
 
-        if (_toPlaceBuildingResource == null || !IsPlacingBuilding(currentGridCellPosition)) return;
+        var currentGridCellPosition = _gridManager.GetMouseGridCellPosition();
+        _buildingGhost.Position = currentGridCellPosition * Grid.CellPixelSize;
+
+        if (_toPlaceBuildingResource == null ||
+            (_hoveredGridCell.HasValue && _hoveredGridCell.Value == currentGridCellPosition))
+            return;
 
         _hoveredGridCell = currentGridCellPosition;
-
-        _gridManager.ClearHighlightTileMapLayer();
-
-        _gridManager.HighlightPotentialTilesForBuildings(
-            _hoveredGridCell.Value,
-            _toPlaceBuildingResource.BuildableRadius);
-
-        _gridManager.HighlightResourceTiles(
-            _hoveredGridCell.Value,
-            _toPlaceBuildingResource.ResourceRadius);
+        UpdateGridDisplay();
     }
 
     public override void _Ready()
@@ -60,25 +57,34 @@ public partial class BuildingManager : Node
         if (!CanPlaceBuilding(@event)) return;
 
         PlaceBuildingAtHoveredCellPosition();
-        _cursor.Visible = false;
     }
 
     private bool CanPlaceBuilding(InputEvent @event) =>
         @event.IsActionPressed("left_click")
         && _toPlaceBuildingResource != null
         && _hoveredGridCell.HasValue
-        && _gridManager.IsWithinValidBuildArea(_hoveredGridCell.Value)
+        && IsBuildingPlaceableAtTile(_hoveredGridCell.Value);
+
+    private bool IsBuildingPlaceableAtTile(Vector2I tilePosition) =>
+        _gridManager.IsWithinValidBuildArea(tilePosition)
         && AvailableResourceCount >= _toPlaceBuildingResource.ResourceCost;
 
     private bool IsPlacingBuilding(Vector2I gridPosition) =>
-        _cursor.Visible && (!_hoveredGridCell.HasValue || _hoveredGridCell.Value != gridPosition);
+        !_hoveredGridCell.HasValue || _hoveredGridCell.Value != gridPosition;
 
     private void OnPlaceBuildingResourceSelected(BuildingResource resource)
     {
-        _toPlaceBuildingResource = resource;
-        _cursor.Visible          = true;
+        if (IsInstanceValid(_buildingGhost)) _buildingGhost.QueueFree();
 
-        _gridManager.HighlightBuildRadiusOfOccupiedTiles();
+        _buildingGhost = _buildingGhostScene.Instantiate<BuildingGhost>();
+        _ySortRoot.AddChild(_buildingGhost);
+
+        var buildingSprite = resource.SpriteScene.Instantiate<Sprite2D>();
+        _buildingGhost.AddChild(buildingSprite);
+
+        _toPlaceBuildingResource = resource;
+
+        UpdateGridDisplay();
     }
 
     private void OnResourceTilesUpdated(int resourceCount)
@@ -100,6 +106,31 @@ public partial class BuildingManager : Node
 
         _currentlyUsedResourceCount += _toPlaceBuildingResource.ResourceCost;
 
-        GD.Print($"Available resource count: {AvailableResourceCount}");
+        _buildingGhost.QueueFree();
+        _buildingGhost = null;
+    }
+
+    private void UpdateGridDisplay()
+    {
+        if (_hoveredGridCell == null) return;
+
+        _gridManager.ClearHighlightTileMapLayer();
+        _gridManager.HighlightBuildRadiusOfOccupiedTiles();
+
+        if (!IsBuildingPlaceableAtTile(_hoveredGridCell.Value))
+        {
+            _buildingGhost.SetInvalid();
+            return;
+        }
+
+        _gridManager.HighlightPotentialTilesForBuildings(
+            _hoveredGridCell.Value,
+            _toPlaceBuildingResource.BuildableRadius);
+
+        _gridManager.HighlightResourceTiles(
+            _hoveredGridCell.Value,
+            _toPlaceBuildingResource.ResourceRadius);
+
+        _buildingGhost.SetValid();
     }
 }
