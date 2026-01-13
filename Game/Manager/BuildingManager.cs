@@ -6,6 +6,10 @@ namespace PuzzleCourse.Game.Manager;
 
 public partial class BuildingManager : Node
 {
+    private readonly StringName _actionCancel = "cancel";
+
+    private readonly StringName _actionLeftClick = "left_click";
+
     private BuildingGhost _buildingGhost;
 
     [Export]
@@ -54,16 +58,25 @@ public partial class BuildingManager : Node
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (!CanPlaceBuilding(@event)) return;
-
-        PlaceBuildingAtHoveredCellPosition();
+        if (@event.IsActionPressed(_actionCancel)) ClearBuildingGhost();
+        else if (CanPlaceBuilding(@event)) PlaceBuildingAtHoveredCellPosition();
     }
 
     private bool CanPlaceBuilding(InputEvent @event) =>
-        @event.IsActionPressed("left_click")
+        @event.IsActionPressed(_actionLeftClick)
         && _toPlaceBuildingResource != null
         && _hoveredGridCell.HasValue
         && IsBuildingPlaceableAtTile(_hoveredGridCell.Value);
+
+    private void ClearBuildingGhost()
+    {
+        _hoveredGridCell = null;
+        _gridManager.ClearHighlightTileMapLayer();
+
+        if (IsInstanceValid(_buildingGhost)) _buildingGhost.QueueFree();
+
+        _buildingGhost = null;
+    }
 
     private bool IsBuildingPlaceableAtTile(Vector2I tilePosition) =>
         _gridManager.IsWithinValidBuildArea(tilePosition)
@@ -101,13 +114,9 @@ public partial class BuildingManager : Node
 
         _ySortRoot.AddChild(building);
 
-        _hoveredGridCell = null;
-        _gridManager.ClearHighlightTileMapLayer();
-
         _currentlyUsedResourceCount += _toPlaceBuildingResource.ResourceCost;
 
-        _buildingGhost.QueueFree();
-        _buildingGhost = null;
+        ClearBuildingGhost();
     }
 
     private void UpdateGridDisplay()
