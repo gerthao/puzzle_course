@@ -23,6 +23,12 @@ public partial class BuildingComponent : Node2D
             .CallDeferred();
     }
 
+    public void Destroy()
+    {
+        GameEvents.EmitBuildingDestroyed(this);
+        Owner.QueueFree();
+    }
+
     public Vector2I GetGridCellPosition()
     {
         var (x, y) = (GlobalPosition / Grid.CellPixelSize).Floor();

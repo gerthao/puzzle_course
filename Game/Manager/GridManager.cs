@@ -11,12 +11,17 @@ namespace PuzzleCourse.Game.Manager;
 public partial class GridManager : Node
 {
     [Signal]
+    public delegate void GridStateUpdatedEventHandler();
+
+    [Signal]
     public delegate void ResourceTilesUpdatedEventHandler(int collectedTiles);
 
     private const string IsBuildable = "is_buildable";
     private const string IsWood = "is_wood";
 
     private readonly HashSet<Vector2I> _collectedResourceTiles = [];
+
+    private readonly HashSet<Vector2I> _occupiedTiles = [];
 
     private readonly HashSet<Vector2I> _validBuildableTiles = [];
 
@@ -30,18 +35,26 @@ public partial class GridManager : Node
 
     public override void _Ready()
     {
-        GameEvents.Instance.BuildingPlaced += OnBuildingPlaced;
+        GameEvents.Instance.BuildingPlaced    += OnBuildingPlaced;
+        GameEvents.Instance.BuildingDestroyed += OnBuildingDestroyed;
 
         _allTileMapLayers = GetAllTileMapLayers(_baseTerrainTileMapLayer);
     }
 
     public void ClearHighlightTileMapLayer() => _highlightTileMapLayer.Clear();
 
-    public Vector2I GetMouseGridCellPosition()
+    public Vector2I ConvertWorldPositionToTilePosition(Vector2 worldPosition)
     {
-        var (x, y) = (_highlightTileMapLayer.GetGlobalMousePosition() / Grid.CellPixelSize).Floor();
+        var (x, y) = (worldPosition / Grid.CellPixelSize).Floor();
 
         return new Vector2I((int)x, (int)y);
+    }
+
+    public Vector2I GetMouseGridCellPosition()
+    {
+        var mousePosition = _highlightTileMapLayer.GetGlobalMousePosition();
+
+        return ConvertWorldPositionToTilePosition(mousePosition);
     }
 
 
@@ -56,7 +69,7 @@ public partial class GridManager : Node
         var validTiles = GetBuildableTileRegion(tilePosition, radius).ToHashSet();
         var expandedTiles = validTiles
             .Except(_validBuildableTiles)
-            .Except(GetOccupiedTiles());
+            .Except(_occupiedTiles);
         var atlasCoord = new Vector2I(1, 0);
 
         // HighlightBuildRadiusOfOccupiedTiles();
@@ -109,16 +122,6 @@ public partial class GridManager : Node
     private IEnumerable<Vector2I> GetBuildableTileRegion(Vector2I center, int radius) =>
         GetTilesInRadius(center, radius, tp => HasTileCustomData(tp, IsBuildable));
 
-    private IEnumerable<Vector2I> GetOccupiedTiles()
-    {
-        foreach (var node in GetTree().GetNodesInGroup(nameof(BuildingComponent)))
-        {
-            var bc = (BuildingComponent)node;
-
-            yield return bc.GetGridCellPosition();
-        }
-    }
-
     private IEnumerable<Vector2I> GetResourceTileRegion(Vector2I center, int radius) =>
         GetTilesInRadius(center, radius, tp => HasTileCustomData(tp, IsWood));
 
@@ -150,10 +153,37 @@ public partial class GridManager : Node
         return customProperty.HasValue && customProperty.Value.AsBool();
     }
 
+    private void OnBuildingDestroyed(BuildingComponent component)
+    {
+        RecalculateGrid(component);
+    }
+
     private void OnBuildingPlaced(BuildingComponent component)
     {
         UpdateValidBuildableTiles(component);
         UpdateCollectedResourceTiles(component);
+    }
+
+    private void RecalculateGrid(BuildingComponent excludedComponent)
+    {
+        _occupiedTiles.Clear();
+        _validBuildableTiles.Clear();
+        _collectedResourceTiles.Clear();
+
+        var buildingComponents =
+            GetTree()
+                .GetNodesInGroup(nameof(BuildingComponent))
+                .Cast<BuildingComponent>()
+                .Where(bc => bc != excludedComponent);
+
+        foreach (var component in buildingComponents)
+        {
+            UpdateValidBuildableTiles(component);
+            UpdateCollectedResourceTiles(component);
+        }
+
+        EmitSignalResourceTilesUpdated(_collectedResourceTiles.Count);
+        EmitSignalGridStateUpdated();
     }
 
     private void UpdateCollectedResourceTiles(BuildingComponent component)
@@ -166,18 +196,22 @@ public partial class GridManager : Node
         _collectedResourceTiles.UnionWith(tiles);
         var newCount = _collectedResourceTiles.Count;
 
-        if (previousCount == newCount) return;
+        if (previousCount != newCount) EmitSignalResourceTilesUpdated(_collectedResourceTiles.Count);
 
-        EmitSignalResourceTilesUpdated(_collectedResourceTiles.Count);
+        EmitSignalGridStateUpdated();
     }
 
     private void UpdateValidBuildableTiles(BuildingComponent component)
     {
+        _occupiedTiles.Add(component.GetGridCellPosition());
+
         var rootCell = component.GetGridCellPosition();
         var radius   = component.BuildingResource.BuildableRadius;
         var tiles    = GetBuildableTileRegion(rootCell, radius).ToHashSet();
 
         _validBuildableTiles.UnionWith(tiles);
-        _validBuildableTiles.ExceptWith(GetOccupiedTiles());
+        _validBuildableTiles.ExceptWith(_occupiedTiles);
+
+        EmitSignalGridStateUpdated();
     }
 }

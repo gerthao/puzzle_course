@@ -1,4 +1,6 @@
+using System.Linq;
 using Godot;
+using PuzzleCourse.Game.Component;
 using PuzzleCourse.Game.UI;
 using PuzzleCourse.Resources.Building;
 
@@ -128,6 +130,18 @@ public partial class BuildingManager : Node
 
     private void DestroyBuildingAtHoveredCellPosition()
     {
+        var buildingToDestroy =
+            GetTree()
+                .GetNodesInGroup(nameof(BuildingComponent))
+                .Cast<BuildingComponent>()
+                .FirstOrDefault(bc => bc.GetGridCellPosition() == _hoveredGridCell);
+
+        if (buildingToDestroy == null) return;
+
+        _currentlyUsedResourceCount -= buildingToDestroy.BuildingResource.ResourceCost;
+        buildingToDestroy.Destroy();
+        GD.Print($"Destroyed building at {_hoveredGridCell}");
+        GD.Print($"Available resources: {AvailableResourceCount}");
     }
 
     private bool IsBuildingPlaceableAtTile(Vector2I tilePosition) =>
