@@ -1,10 +1,14 @@
-[gd_scene load_steps=4 format=3 uid="uid://doksfogr625qu"]
+[gd_scene format=3 uid="uid://doksfogr625qu"]
 
 [ext_resource type="Script" uid="uid://cdufcgev0eqvq" path="res://Game/UI/GameUI.cs" id="1_13cgw"]
 [ext_resource type="Resource" uid="uid://beoplkuaks3rv" path="res://Resources/Building/Tower.tres" id="2_xkiwj"]
 [ext_resource type="Resource" uid="uid://by73xowutfdwi" path="res://Resources/Building/Village.tres" id="3_tog36"]
 
-[node name="GameUI" type="MarginContainer"]
+[node name="GameUI" type="CanvasLayer" unique_id=1850438730]
+script = ExtResource("1_13cgw")
+_buildingResources = Array[Object]([ExtResource("3_tog36"), ExtResource("2_xkiwj")])
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1493641971]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -14,10 +18,8 @@ theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
-script = ExtResource("1_13cgw")
-_buildingResources = Array[Object]([ExtResource("2_xkiwj"), ExtResource("3_tog36")])
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=169476261]
 layout_mode = 2
 size_flags_vertical = 8
 theme_override_constants/separation = 16

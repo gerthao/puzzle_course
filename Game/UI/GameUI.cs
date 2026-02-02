@@ -3,7 +3,7 @@ using PuzzleCourse.Resources.Building;
 
 namespace PuzzleCourse.Game.UI;
 
-public partial class GameUI : MarginContainer
+public partial class GameUI : CanvasLayer
 {
     [Signal]
     public delegate void BuildingResourceSelectedEventHandler(BuildingResource resource);
@@ -15,7 +15,7 @@ public partial class GameUI : MarginContainer
 
     public override void _Ready()
     {
-        _hBoxContainer = GetNode<HBoxContainer>("HBoxContainer");
+        _hBoxContainer = GetNode<HBoxContainer>("MarginContainer/HBoxContainer");
 
         InitializeBuildingButtons();
     }

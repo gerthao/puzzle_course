@@ -32,6 +32,7 @@ public partial class BuildingManager : Node
 
     private Vector2I _hoveredGridCell;
 
+    [Export]
     private int _startingResourceCount = 4;
 
     private BuildingResource _toPlaceBuildingResource;

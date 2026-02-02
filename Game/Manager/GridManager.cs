@@ -18,6 +18,7 @@ public partial class GridManager : Node
 
     private const string IsBuildable = "is_buildable";
     private const string IsWood = "is_wood";
+    private const string IsIgnored = "is_ignored";
 
     private readonly HashSet<Vector2I> _collectedResourceTiles = [];
 
@@ -93,11 +94,11 @@ public partial class GridManager : Node
     {
         foreach (var layer in _allTileMapLayers)
         {
-            var maybeCustomData = layer
-                ?.GetCellTileData(tilePosition)
-                ?.GetCustomData(customDataName);
+            var customData = layer.GetCellTileData(tilePosition);
 
-            if (maybeCustomData.HasValue) return maybeCustomData.Value;
+            if (customData == null || (bool)customData.GetCustomData(IsIgnored)) continue;
+
+            return (bool)customData.GetCustomData(customDataName);
         }
 
         return null;
