@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="BuildingResource" load_steps=4 format=3 uid="uid://beoplkuaks3rv"]
+[gd_resource type="Resource" script_class="BuildingResource" format=3 uid="uid://beoplkuaks3rv"]
 
 [ext_resource type="Script" uid="uid://bk1u8jg2pwdt0" path="res://Resources/Building/BuildingResource.cs" id="1_8ahm4"]
 [ext_resource type="PackedScene" uid="uid://dfu1snbqlo76l" path="res://Game/Building/Tower.tscn" id="1_yty4p"]
@@ -7,8 +7,9 @@
 [resource]
 script = ExtResource("1_8ahm4")
 DisplayName = "Tower"
+Dimensions = Vector2i(2, 2)
 ResourceCost = 4
-BuildableRadius = 3
+BuildableRadius = 6
 BuildingScene = ExtResource("1_yty4p")
 SpriteScene = ExtResource("2_8yx80")
 metadata/_custom_type_script = "uid://bk1u8jg2pwdt0"

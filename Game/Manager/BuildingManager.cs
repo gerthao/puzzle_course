@@ -30,7 +30,7 @@ public partial class BuildingManager : Node
     [Export]
     private GridManager _gridManager;
 
-    private Vector2I _hoveredGridCell;
+    private Rect2I _hoveredGridArea = new(Vector2I.Zero, Vector2I.One);
 
     [Export]
     private int _startingResourceCount = 4;
@@ -50,12 +50,13 @@ public partial class BuildingManager : Node
 
     public override void _Process(double delta)
     {
-        var currentGridCellPosition = _gridManager.GetMouseGridCellPosition();
+        var mouseGridPosition = _gridManager.GetMouseGridCellPosition();
+        var rootCell          = _hoveredGridArea.Position;
 
-        if (_hoveredGridCell != currentGridCellPosition)
+        if (rootCell != mouseGridPosition)
         {
-            _hoveredGridCell = currentGridCellPosition;
-            UpdateHoveredGridCell();
+            _hoveredGridArea.Position = mouseGridPosition;
+            UpdateHoveredGridArea();
         }
 
         switch (_currentState)
@@ -63,7 +64,7 @@ public partial class BuildingManager : Node
             case State.Normal:
                 break;
             case State.PlacingBuilding:
-                _buildingGhost.Position = currentGridCellPosition * Grid.CellPixelSize;
+                _buildingGhost.Position = mouseGridPosition * Grid.CellPixelSize;
                 break;
         }
     }
@@ -93,7 +94,7 @@ public partial class BuildingManager : Node
     private bool CanPlaceBuilding(InputEvent @event) =>
         @event.IsActionPressed(_actionLeftClick)
         && _toPlaceBuildingResource != null
-        && IsBuildingPlaceableAtTile(_hoveredGridCell);
+        && IsBuildingPlaceableAtArea(_hoveredGridArea);
 
     private void ChangeState(State newState)
     {
@@ -131,30 +132,40 @@ public partial class BuildingManager : Node
 
     private void DestroyBuildingAtHoveredCellPosition()
     {
+        var rootCell = _hoveredGridArea.Position;
+
         var buildingToDestroy =
             GetTree()
                 .GetNodesInGroup(nameof(BuildingComponent))
                 .Cast<BuildingComponent>()
-                .FirstOrDefault(bc => bc.GetGridCellPosition() == _hoveredGridCell);
+                .FirstOrDefault(bc => bc.BuildingResource.IsDeleteable && bc.IsTileInBuildingArea(rootCell));
 
         if (buildingToDestroy == null) return;
 
         _currentlyUsedResourceCount -= buildingToDestroy.BuildingResource.ResourceCost;
+
         buildingToDestroy.Destroy();
-        GD.Print($"Destroyed building at {_hoveredGridCell}");
+
+        GD.Print($"Destroyed building at {_hoveredGridArea}");
         GD.Print($"Available resources: {AvailableResourceCount}");
     }
 
-    private bool IsBuildingPlaceableAtTile(Vector2I tilePosition) =>
-        _gridManager.IsWithinValidBuildArea(tilePosition)
-        && AvailableResourceCount >= _toPlaceBuildingResource.ResourceCost;
+    private bool IsBuildingPlaceableAtArea(Rect2I tileArea)
+    {
+        var allTilesBuildable = _gridManager.IsTileAreaBuildable(tileArea);
+
+        return allTilesBuildable
+            && AvailableResourceCount >= _toPlaceBuildingResource.ResourceCost;
+    }
 
     private bool IsPlacingBuilding(Vector2I gridPosition) =>
-        _hoveredGridCell != gridPosition;
+        _hoveredGridArea.Position != gridPosition;
 
     private void OnPlaceBuildingResourceSelected(BuildingResource resource)
     {
         ChangeState(State.PlacingBuilding);
+
+        _hoveredGridArea.Size = resource.Dimensions;
 
         var buildingSprite = resource.SpriteScene.Instantiate<Sprite2D>();
         _buildingGhost.AddChild(buildingSprite);
@@ -172,7 +183,7 @@ public partial class BuildingManager : Node
     private void PlaceBuildingAtHoveredCellPosition()
     {
         var building = _toPlaceBuildingResource.BuildingScene.Instantiate<Node2D>();
-        building.GlobalPosition = _hoveredGridCell * Grid.CellPixelSize;
+        building.GlobalPosition = _hoveredGridArea.Position * Grid.CellPixelSize;
 
         _ySortRoot.AddChild(building);
 
@@ -186,24 +197,24 @@ public partial class BuildingManager : Node
         _gridManager.ClearHighlightTileMapLayer();
         _gridManager.HighlightBuildRadiusOfOccupiedTiles();
 
-        if (!IsBuildingPlaceableAtTile(_hoveredGridCell))
+        if (!IsBuildingPlaceableAtArea(_hoveredGridArea))
         {
             _buildingGhost.SetInvalid();
             return;
         }
 
         _gridManager.HighlightPotentialTilesForBuildings(
-            _hoveredGridCell,
+            _hoveredGridArea,
             _toPlaceBuildingResource.BuildableRadius);
 
         _gridManager.HighlightResourceTiles(
-            _hoveredGridCell,
+            _hoveredGridArea,
             _toPlaceBuildingResource.ResourceRadius);
 
         _buildingGhost.SetValid();
     }
 
-    private void UpdateHoveredGridCell()
+    private void UpdateHoveredGridArea()
     {
         switch (_currentState)
         {

@@ -14,8 +14,5 @@ public partial class GoldMine : Node2D
         _sprite = GetNode<Sprite2D>("Sprite2D");
     }
 
-    public void SetActive()
-    {
-        _sprite.Texture = _activeTexture;
-    }
+    public void SetActive() => _sprite.Texture = _activeTexture;
 }
