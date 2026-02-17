@@ -15,13 +15,14 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="PuzzleCourse"
-run/main_scene="uid://dl4uxdu4jvt6k"
+run/main_scene="uid://8bpuhjb6g0wr"
 config/features=PackedStringArray("4.6", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 GameEvents="*res://Game/Autoload/GameEvents.tscn"
+LevelManager="*uid://duvhfc4fwxvlb"
 
 [display]
 

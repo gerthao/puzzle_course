@@ -10,7 +10,6 @@ public partial class BuildingSection : PanelContainer
 
     private Label _costLabel;
     private Label _descriptionLabel;
-
     private Button _selectButton;
     private Label _titleLabel;
 

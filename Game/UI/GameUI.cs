@@ -1,4 +1,5 @@
 using Godot;
+using PuzzleCourse.Game.Manager;
 using PuzzleCourse.Resources.Building;
 
 namespace PuzzleCourse.Game.UI;
@@ -9,6 +10,9 @@ public partial class GameUI : CanvasLayer
     public delegate void BuildingResourceSelectedEventHandler(BuildingResource resource);
 
     [Export]
+    private BuildingManager _buildingManager;
+
+    [Export]
     private BuildingResource[] _buildingResources;
 
     [Export]
@@ -16,9 +20,13 @@ public partial class GameUI : CanvasLayer
 
     private VBoxContainer _hBoxContainer;
 
+    private Label _resourceLabel;
+
     public override void _Ready()
     {
-        _hBoxContainer = GetNode<VBoxContainer>("%BuildingSectionContainer");
+        _hBoxContainer                                 =  GetNode<VBoxContainer>("%BuildingSectionContainer");
+        _resourceLabel                                 =  GetNode<Label>("%ResourceLabel");
+        _buildingManager.AvailableResourceCountUpdated += OnAvailableResourceCountChanged;
 
         InitializeBuildingSections();
     }
@@ -34,4 +42,6 @@ public partial class GameUI : CanvasLayer
             section.SelectButtonPressed += () => EmitSignalBuildingResourceSelected(resource);
         }
     }
+
+    private void OnAvailableResourceCountChanged(int newCount) => _resourceLabel.Text = newCount.ToString();
 }

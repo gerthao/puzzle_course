@@ -8,6 +8,9 @@ namespace PuzzleCourse.Game.Manager;
 
 public partial class BuildingManager : Node
 {
+    [Signal]
+    public delegate void AvailableResourceCountUpdatedEventHandler(int availableResourceCount);
+
     private readonly StringName _actionCancel = "cancel";
 
     private readonly StringName _actionLeftClick = "left_click";
@@ -73,6 +76,10 @@ public partial class BuildingManager : Node
     {
         _gameUI.BuildingResourceSelected  += OnPlaceBuildingResourceSelected;
         _gridManager.ResourceTilesUpdated += OnResourceTilesUpdated;
+
+        Callable
+            .From(() => EmitSignalAvailableResourceCountUpdated(AvailableResourceCount))
+            .CallDeferred();
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -145,9 +152,6 @@ public partial class BuildingManager : Node
         _currentlyUsedResourceCount -= buildingToDestroy.BuildingResource.ResourceCost;
 
         buildingToDestroy.Destroy();
-
-        GD.Print($"Destroyed building at {_hoveredGridArea}");
-        GD.Print($"Available resources: {AvailableResourceCount}");
     }
 
     private bool IsBuildingPlaceableAtArea(Rect2I tileArea)
@@ -178,6 +182,8 @@ public partial class BuildingManager : Node
     private void OnResourceTilesUpdated(int resourceCount)
     {
         _currentResourceCount = resourceCount;
+
+        EmitSignalAvailableResourceCountUpdated(AvailableResourceCount);
     }
 
     private void PlaceBuildingAtHoveredCellPosition()
@@ -190,6 +196,7 @@ public partial class BuildingManager : Node
         _currentlyUsedResourceCount += _toPlaceBuildingResource.ResourceCost;
 
         ChangeState(State.Normal);
+        EmitSignalAvailableResourceCountUpdated(AvailableResourceCount);
     }
 
     private void UpdateGridDisplay()
