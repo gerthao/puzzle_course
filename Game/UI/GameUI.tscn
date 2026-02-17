@@ -3,10 +3,12 @@
 [ext_resource type="Script" uid="uid://cdufcgev0eqvq" path="res://Game/UI/GameUI.cs" id="1_13cgw"]
 [ext_resource type="Resource" uid="uid://beoplkuaks3rv" path="res://Resources/Building/Tower.tres" id="2_xkiwj"]
 [ext_resource type="Resource" uid="uid://by73xowutfdwi" path="res://Resources/Building/Village.tres" id="3_tog36"]
+[ext_resource type="PackedScene" uid="uid://cajy60rrxd3tr" path="res://Game/UI/BuildingSection.tscn" id="4_m2t0n"]
 
 [node name="GameUI" type="CanvasLayer" unique_id=1850438730]
 script = ExtResource("1_13cgw")
 _buildingResources = Array[Object]([ExtResource("3_tog36"), ExtResource("2_xkiwj")])
+_buildingSectionScene = ExtResource("4_m2t0n")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1493641971]
 anchors_preset = 15
@@ -19,7 +21,11 @@ theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=169476261]
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer" unique_id=1783924740]
 layout_mode = 2
-size_flags_vertical = 8
+size_flags_horizontal = 0
+
+[node name="BuildingSectionContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer" unique_id=360598490]
+unique_name_in_owner = true
+layout_mode = 2
 theme_override_constants/separation = 16

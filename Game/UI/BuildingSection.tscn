@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://cajy60rrxd3tr"]
+
+[ext_resource type="Script" uid="uid://cjepqhm4ihv0u" path="res://Game/UI/BuildingSection.cs" id="1_wrhfh"]
+[ext_resource type="Texture2D" uid="uid://5gljnpq18rix" path="res://Assets/wood_icon.png" id="2_orxow"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rmvie"]
+atlas = ExtResource("2_orxow")
+region = Rect2(39, 72, 32, 28)
+
+[node name="BuildingSection" type="PanelContainer" unique_id=717812502]
+theme_type_variation = &"PanelContainerAlternate"
+script = ExtResource("1_wrhfh")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=41998263]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer" unique_id=526971211]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer/VBoxContainer" unique_id=117136546]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.61960787, 0.5294118, 0.4627451, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 32
+text = "Village"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/VBoxContainer" unique_id=31618384]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/VBoxContainer/HBoxContainer" unique_id=749905110]
+layout_mode = 2
+texture = SubResource("AtlasTexture_rmvie")
+
+[node name="CostLabel" type="Label" parent="VBoxContainer/VBoxContainer/HBoxContainer" unique_id=533335708]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.61960787, 0.5294118, 0.4627451, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 32
+text = "4"
+
+[node name="DescriptionLabel" type="Label" parent="VBoxContainer/VBoxContainer" unique_id=1326603321]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.61960787, 0.5294118, 0.4627451, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 1
+text = "Gathers wood"
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="VBoxContainer" unique_id=2042581260]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Select"

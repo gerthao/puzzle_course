@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -195,7 +194,6 @@ public partial class GridManager : Node
             yield return new Vector2I(x, y);
     }
 
-
     private (TileMapLayer, Variant?) GetTileMapLayerAndCustomData(Vector2I tilePosition, string customDataName)
     {
         foreach (var layer in _allTileMapLayers)
@@ -208,13 +206,6 @@ public partial class GridManager : Node
         }
 
         return (null, null);
-    }
-
-    private static IEnumerable<Vector2I> GetTilesInRadius(Rect2I tileArea, int radius, Func<Vector2I, bool> filter)
-    {
-        foreach (var t in GetCircleRegion(tileArea, radius))
-            if (filter(t))
-                yield return t;
     }
 
     private IEnumerable<Vector2I> GetValidTilesInRadius(Rect2I tileArea, int radius)
