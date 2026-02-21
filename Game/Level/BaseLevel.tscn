@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b8u1dg7t55223"]
 
 [ext_resource type="Script" uid="uid://c6xtbsgdneneo" path="res://Game/Level/BaseLevel.cs" id="1_wd0a0"]
+[ext_resource type="PackedScene" uid="uid://dapkjdbmsmg4m" path="res://Game/UI/LevelCompleteScreen.tscn" id="2_ei0tr"]
 [ext_resource type="PackedScene" uid="uid://4lv48ibsgy3d" path="res://Game/Manager/BuildingManager.tscn" id="2_haytw"]
 [ext_resource type="TileSet" uid="uid://brk8dkdo6374l" path="res://Resources/HighlightTileset.tres" id="2_lv82p"]
 [ext_resource type="Script" uid="uid://r0uytgnccyfp" path="res://Game/Manager/GridManager.cs" id="2_rchnd"]
@@ -13,6 +14,7 @@
 
 [node name="BaseLevel" type="Node" unique_id=2139989477]
 script = ExtResource("1_wd0a0")
+_levelCompleteScreen = ExtResource("2_ei0tr")
 
 [node name="BuildingManager" parent="." unique_id=1617163538 node_paths=PackedStringArray("_gameUI", "_gridManager", "_ySortRoot") instance=ExtResource("2_haytw")]
 _buildingGhostScene = ExtResource("8_3xx61")

@@ -4,6 +4,8 @@ namespace PuzzleCourse.Game.Autoload;
 
 public partial class LevelManager : Node
 {
+    private int _currentLevelIndex;
+
     [Export]
     private PackedScene[] _levelScenes;
 
@@ -22,6 +24,12 @@ public partial class LevelManager : Node
             return;
         }
 
-        GetTree().ChangeSceneToPacked(_levelScenes[levelIndex]);
+        _currentLevelIndex = levelIndex;
+
+        GetTree().ChangeSceneToPacked(_levelScenes[_currentLevelIndex]);
     }
+
+    public void ChangeToNextLevel() => ChangeToLevel(_currentLevelIndex + 1);
+
+    public void RestartLevel() => ChangeToLevel(_currentLevelIndex);
 }

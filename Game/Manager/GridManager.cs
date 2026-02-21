@@ -37,10 +37,25 @@ public partial class GridManager : Node
 
     private Dictionary<TileMapLayer, ElevationLayer> _tileMapLayerToElevationLayer;
 
+    public override void _ExitTree()
+    {
+        GameEvents.Instance.BuildingPlaced    -= OnBuildingPlaced;
+        GameEvents.Instance.BuildingDestroyed -= OnBuildingDestroyed;
+    }
+
     public override void _Ready()
     {
         GameEvents.Instance.BuildingPlaced    += OnBuildingPlaced;
         GameEvents.Instance.BuildingDestroyed += OnBuildingDestroyed;
+
+        /*
+         * Alternate way of connecting signals with automatic disconnection
+         */
+
+        // GameEvents.Instance.Connect(GameEvents.SignalName.BuildingPlaced,
+        //     Callable.From<BuildingComponent>(OnBuildingPlaced));
+        // GameEvents.Instance.Connect(GameEvents.SignalName.BuildingDestroyed,
+        //     Callable.From<BuildingComponent>(OnBuildingDestroyed));
 
         _allTileMapLayers             = GetAllTileMapLayers(_baseTerrainTileMapLayer).ToList();
         _tileMapLayerToElevationLayer = BuildTileMapLayerToElevationLayer(_allTileMapLayers);
@@ -48,7 +63,7 @@ public partial class GridManager : Node
 
     public void ClearHighlightTileMapLayer() => _highlightTileMapLayer.Clear();
 
-    public Vector2I ConvertWorldPositionToTilePosition(Vector2 worldPosition)
+    public static Vector2I ConvertWorldPositionToTilePosition(Vector2 worldPosition)
     {
         var (x, y) = (worldPosition / Grid.CellPixelSize).Floor();
 
@@ -158,7 +173,7 @@ public partial class GridManager : Node
         return null;
     }
 
-    private IEnumerable<TileMapLayer> GetAllTileMapLayers(Node2D rootNode)
+    private static IEnumerable<TileMapLayer> GetAllTileMapLayers(Node2D rootNode)
     {
         var children = rootNode.GetChildren().OfType<Node2D>().Reverse();
 

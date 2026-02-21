@@ -31,6 +31,12 @@ public partial class GameUI : CanvasLayer
         InitializeBuildingSections();
     }
 
+    public void HideUI() => Visible = false;
+
+    public void ShowUI() => Visible = true;
+
+    public void ToggleUI() => Visible = !Visible;
+
     private void InitializeBuildingSections()
     {
         foreach (var resource in _buildingResources)
