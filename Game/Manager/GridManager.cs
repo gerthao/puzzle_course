@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -20,6 +21,8 @@ public partial class GridManager : Node
     private const string IsBuildable = "is_buildable";
     private const string IsWood = "is_wood";
     private const string IsIgnored = "is_ignored";
+
+    private readonly HashSet<Vector2I> _allTilesInBuildingRadius = [];
 
     private readonly HashSet<Vector2I> _collectedResourceTiles = [];
 
@@ -135,6 +138,9 @@ public partial class GridManager : Node
         return true;
     }
 
+    public bool IsTilePositionInAnyBuildingRadius(Vector2I tilePosition) =>
+        _allTilesInBuildingRadius.Contains(tilePosition);
+
     public bool IsWithinValidBuildArea(Vector2I tilePosition) => _validBuildableTiles.Contains(tilePosition);
 
     private Dictionary<TileMapLayer, ElevationLayer> BuildTileMapLayerToElevationLayer(IEnumerable<TileMapLayer> layers)
@@ -223,6 +229,19 @@ public partial class GridManager : Node
         return (null, null);
     }
 
+    private IEnumerable<Vector2I> GetTilesInRadius(Rect2I tileArea, int radius, Func<Vector2I, bool> filter)
+    {
+        foreach (var t in GetCircleRegion(tileArea, radius))
+            if (filter(t))
+                yield return t;
+    }
+
+    private IEnumerable<Vector2I> GetTilesInRadius(Rect2I tileArea, int radius)
+    {
+        foreach (var t in GetCircleRegion(tileArea, radius))
+            yield return t;
+    }
+
     private IEnumerable<Vector2I> GetValidTilesInRadius(Rect2I tileArea, int radius)
     {
         foreach (var t in GetCircleRegion(tileArea, radius))
@@ -264,6 +283,7 @@ public partial class GridManager : Node
         _occupiedTiles.Clear();
         _validBuildableTiles.Clear();
         _collectedResourceTiles.Clear();
+        _allTilesInBuildingRadius.Clear();
 
         var buildingComponents =
             GetTree()
@@ -301,10 +321,15 @@ public partial class GridManager : Node
     {
         _occupiedTiles.UnionWith(component.GetOccupiedCellPositions());
 
+        var radius = component.BuildingResource.BuildableRadius;
+
         var rootCell = component.GetGridCellPosition();
         var tileArea = new Rect2I(rootCell, component.BuildingResource.Dimensions);
-        var radius   = component.BuildingResource.BuildableRadius;
-        var tiles    = GetValidTilesInRadius(tileArea, radius).ToHashSet();
+
+        var allTiles = GetTilesInRadius(tileArea, radius);
+        _allTilesInBuildingRadius.UnionWith(allTiles);
+
+        var tiles = GetValidTilesInRadius(tileArea, radius).ToHashSet();
 
         _validBuildableTiles.UnionWith(tiles);
         _validBuildableTiles.ExceptWith(_occupiedTiles);

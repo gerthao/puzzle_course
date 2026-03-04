@@ -31,17 +31,27 @@ public partial class BaseLevel : Node
         _gridManager.GridStateUpdated += OnGridStateUpdated;
     }
 
-    private void OnGridStateUpdated()
+    private bool IsGoldMineInReach()
     {
         var goldMineTilePosition = GridManager.ConvertWorldPositionToTilePosition(_goldMine.GlobalPosition);
 
-        if (!_gridManager.IsWithinValidBuildArea(goldMineTilePosition)) return;
+        return _gridManager.IsTilePositionInAnyBuildingRadius(goldMineTilePosition);
+    }
+
+    private void OnGridStateUpdated()
+    {
+        if (!IsGoldMineInReach()) return;
 
         _goldMine.SetActive();
 
-        var scene = _levelCompleteScreen.Instantiate<LevelCompleteScreen>();
-        AddChild(scene);
+        ShowLevelCompleteScreen();
 
         _gameUI.HideUI();
+    }
+
+    private void ShowLevelCompleteScreen()
+    {
+        var scene = _levelCompleteScreen.Instantiate<LevelCompleteScreen>();
+        AddChild(scene);
     }
 }

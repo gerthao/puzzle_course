@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://l5bawrk0yd1j"]
+
+[ext_resource type="PackedScene" uid="uid://c136xs6gakhx5" path="res://Game/UI/LevelSelectSection.tscn" id="1_5viay"]
+
+[node name="LevelSelectScreen" type="MarginContainer" unique_id=596677930]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=813194298]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=419000050]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer" unique_id=629250462]
+layout_mode = 2
+columns = 4
+
+[node name="LevelSelectSection" parent="PanelContainer/MarginContainer/GridContainer" unique_id=1216267102 instance=ExtResource("1_5viay")]
+layout_mode = 2

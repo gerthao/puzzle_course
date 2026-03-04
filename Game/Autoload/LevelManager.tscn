@@ -2,7 +2,8 @@
 
 [ext_resource type="Script" uid="uid://bloqxfcsxku2e" path="res://Game/Autoload/LevelManager.cs" id="1_njl8y"]
 [ext_resource type="PackedScene" uid="uid://dl4uxdu4jvt6k" path="res://Game/Level/Level1.tscn" id="2_2wuy6"]
+[ext_resource type="PackedScene" uid="uid://b31nvljav652x" path="res://Game/Level/Level2.tscn" id="3_8yy28"]
 
 [node name="LevelManager" type="Node" unique_id=1967196886]
 script = ExtResource("1_njl8y")
-_levelScenes = Array[PackedScene]([ExtResource("2_2wuy6"), ExtResource("2_2wuy6")])
+_levelScenes = Array[PackedScene]([ExtResource("2_2wuy6"), ExtResource("3_8yy28")])
