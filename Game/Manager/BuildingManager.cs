@@ -1,5 +1,6 @@
 using System.Linq;
 using Godot;
+using PuzzleCourse.Game.Building;
 using PuzzleCourse.Game.Component;
 using PuzzleCourse.Game.UI;
 using PuzzleCourse.Resources.Building;
@@ -35,8 +36,7 @@ public partial class BuildingManager : Node
 
     private Rect2I _hoveredGridArea = new(Vector2I.Zero, Vector2I.One);
 
-    [Export]
-    private int _startingResourceCount = 4;
+    private int _startingResourceCount;
 
     private BuildingResource _toPlaceBuildingResource;
 
@@ -54,7 +54,7 @@ public partial class BuildingManager : Node
     public override void _Process(double delta)
     {
         var mouseGridPosition = _gridManager.GetMouseGridCellPosition();
-        var rootCell          = _hoveredGridArea.Position;
+        var rootCell = _hoveredGridArea.Position;
 
         if (rootCell != mouseGridPosition)
         {
@@ -74,7 +74,7 @@ public partial class BuildingManager : Node
 
     public override void _Ready()
     {
-        _gameUI.BuildingResourceSelected  += OnPlaceBuildingResourceSelected;
+        _gameUI.BuildingResourceSelected += OnPlaceBuildingResourceSelected;
         _gridManager.ResourceTilesUpdated += OnResourceTilesUpdated;
 
         Callable
@@ -97,6 +97,8 @@ public partial class BuildingManager : Node
                 break;
         }
     }
+
+    public void SetStartingResourceCount(int startingResourceCount) => _startingResourceCount = startingResourceCount;
 
     private bool CanPlaceBuilding(InputEvent @event) =>
         @event.IsActionPressed(_actionLeftClick)
