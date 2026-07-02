@@ -1,4 +1,6 @@
+using System.Linq;
 using Godot;
+using PuzzleCourse.Resources.Level;
 
 namespace PuzzleCourse.Game.Autoload;
 
@@ -7,7 +9,7 @@ public partial class LevelManager : Node
     private int _currentLevelIndex;
 
     [Export]
-    private PackedScene[] _levelScenes;
+    private LevelDefinitionResource[] _levelDefinitions;
 
     public static LevelManager Instance { get; private set; }
 
@@ -18,7 +20,13 @@ public partial class LevelManager : Node
 
     public void ChangeToLevel(int levelIndex)
     {
-        if (levelIndex < 0 || levelIndex >= _levelScenes.Length)
+        if (_levelDefinitions.Length == 0)
+        {
+            GD.PushWarning("No level definitions have been set.");
+            return;
+        }
+
+        if (levelIndex < 0 || levelIndex >= _levelDefinitions.Length)
         {
             GD.PushWarning($"Level index {levelIndex} is out of bounds.");
             return;
@@ -26,10 +34,12 @@ public partial class LevelManager : Node
 
         _currentLevelIndex = levelIndex;
 
-        GetTree().ChangeSceneToPacked(_levelScenes[_currentLevelIndex]);
+        GetTree().ChangeSceneToFile(_levelDefinitions[_currentLevelIndex].LevelScenePath);
     }
 
     public void ChangeToNextLevel() => ChangeToLevel(_currentLevelIndex + 1);
+
+    public static LevelDefinitionResource[] GetLevelDefinitions() => Instance._levelDefinitions.ToArray();
 
     public void RestartLevel() => ChangeToLevel(_currentLevelIndex);
 }

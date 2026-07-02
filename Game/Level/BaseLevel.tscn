@@ -25,7 +25,7 @@ _ySortRoot = NodePath("../YSortRoot")
 [node name="GridManager" type="Node" parent="." unique_id=1321515229 node_paths=PackedStringArray("_baseTerrainTileMapLayer", "_highlightTileMapLayer")]
 script = ExtResource("2_rchnd")
 _baseTerrainTileMapLayer = NodePath("../YSortRoot/BaseTerrainTileMapLayer")
-_highlightTileMapLayer = NodePath("../HighlightTileMapLayer")
+_highlightTileMapLayer = NodePath("../YSortRoot/HighlightTileMapLayer")
 metadata/_custom_type_script = "uid://r0uytgnccyfp"
 
 [node name="GameUI" parent="." unique_id=836740691 instance=ExtResource("6_g5pn2")]
@@ -50,6 +50,7 @@ unique_name_in_owner = true
 [node name="GoldMine" parent="YSortRoot" unique_id=1847832079 instance=ExtResource("7_q34ae")]
 unique_name_in_owner = true
 
-[node name="HighlightTileMapLayer" type="TileMapLayer" parent="." unique_id=1440121212]
+[node name="HighlightTileMapLayer" type="TileMapLayer" parent="YSortRoot" unique_id=1440121212]
 modulate = Color(1, 1, 1, 0.486275)
+y_sort_enabled = true
 tile_set = ExtResource("2_lv82p")

@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://cfyou568vwqg3" path="res://Game/Building/Base.tscn" id="3_bj5vc"]
 [ext_resource type="PackedScene" uid="uid://bgaqnf6ipyug1" path="res://Game/GoldMine.tscn" id="4_gks6f"]
 [ext_resource type="PackedScene" uid="uid://dfu1snbqlo76l" path="res://Game/Building/Tower.tscn" id="5_sr6m2"]
+[ext_resource type="PackedScene" uid="uid://l5bawrk0yd1j" path="res://Game/UI/LevelSelectScreen.tscn" id="7_gks6f"]
 
 [node name="MainMenu" type="Node" unique_id=548609158]
 script = ExtResource("1_bj5vc")
@@ -73,41 +74,45 @@ position = Vector2(736, 128)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=222860040]
 
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer" unique_id=866960157]
+[node name="MainMenuContainer" type="MarginContainer" parent="CanvasLayer" unique_id=866960157]
+unique_name_in_owner = true
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/MarginContainer" unique_id=766882924]
+[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/MainMenuContainer" unique_id=766882924]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MarginContainer/PanelContainer" unique_id=1272889003]
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainMenuContainer/PanelContainer" unique_id=1272889003]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MarginContainer/PanelContainer/MarginContainer" unique_id=663613389]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainMenuContainer/PanelContainer/MarginContainer" unique_id=663613389]
 custom_minimum_size = Vector2(198, 0)
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="PlayButton" type="Button" parent="CanvasLayer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1396789568]
+[node name="PlayButton" type="Button" parent="CanvasLayer/MainMenuContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1396789568]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Play"
 
-[node name="OptionsButton" type="Button" parent="CanvasLayer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=628560252]
+[node name="OptionsButton" type="Button" parent="CanvasLayer/MainMenuContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=628560252]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Options"
 
-[node name="QuitButton" type="Button" parent="CanvasLayer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1883119344]
+[node name="QuitButton" type="Button" parent="CanvasLayer/MainMenuContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1883119344]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Quit"
+
+[node name="LevelSelectScreen" parent="CanvasLayer" unique_id=596677930 instance=ExtResource("7_gks6f")]
+unique_name_in_owner = true

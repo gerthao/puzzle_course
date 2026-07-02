@@ -8,9 +8,6 @@
 [node name="Level1" unique_id=1374572305 instance=ExtResource("1_nl1al")]
 _levelDefinitionResource = ExtResource("2_387fi")
 
-[node name="BuildingManager" parent="." index="0" unique_id=1617163538]
-_startingResourceCount = 2
-
 [node name="GameUI" parent="." index="2" unique_id=836740691 node_paths=PackedStringArray("_buildingManager")]
 _buildingManager = NodePath("../BuildingManager")
 

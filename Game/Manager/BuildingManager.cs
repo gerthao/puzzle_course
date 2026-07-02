@@ -170,14 +170,11 @@ public partial class BuildingManager : Node
     private void OnPlaceBuildingResourceSelected(BuildingResource resource)
     {
         ChangeState(State.PlacingBuilding);
-
         _hoveredGridArea.Size = resource.Dimensions;
-
         var buildingSprite = resource.SpriteScene.Instantiate<Sprite2D>();
         _buildingGhost.AddChild(buildingSprite);
-
+        _buildingGhost.SetDimensions(resource.Dimensions);
         _toPlaceBuildingResource = resource;
-
         UpdateGridDisplay();
     }
 
