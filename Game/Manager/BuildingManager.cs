@@ -54,14 +54,6 @@ public partial class BuildingManager : Node
     public override void _Process(double delta)
     {
         var mouseGridPosition = _gridManager.GetMouseGridCellPosition();
-        var rootCell = _hoveredGridArea.Position;
-
-        if (rootCell != mouseGridPosition)
-        {
-            _hoveredGridArea.Position = mouseGridPosition;
-            UpdateHoveredGridArea();
-        }
-
         switch (_currentState)
         {
             case State.Normal:
@@ -70,6 +62,12 @@ public partial class BuildingManager : Node
                 _buildingGhost.Position = mouseGridPosition * Grid.CellPixelSize;
                 break;
         }
+
+        var rootCell = _hoveredGridArea.Position;
+        if (rootCell == mouseGridPosition) return;
+
+        _hoveredGridArea.Position = mouseGridPosition;
+        UpdateHoveredGridArea();
     }
 
     public override void _Ready()
@@ -172,7 +170,7 @@ public partial class BuildingManager : Node
         ChangeState(State.PlacingBuilding);
         _hoveredGridArea.Size = resource.Dimensions;
         var buildingSprite = resource.SpriteScene.Instantiate<Sprite2D>();
-        _buildingGhost.AddChild(buildingSprite);
+        _buildingGhost.AddSpriteNode(buildingSprite);
         _buildingGhost.SetDimensions(resource.Dimensions);
         _toPlaceBuildingResource = resource;
         UpdateGridDisplay();
@@ -206,18 +204,21 @@ public partial class BuildingManager : Node
         if (!IsBuildingPlaceableAtArea(_hoveredGridArea))
         {
             _buildingGhost.SetInvalid();
-            return;
+        }
+        else
+        {
+            _gridManager.HighlightPotentialTilesForBuildings(
+                _hoveredGridArea,
+                _toPlaceBuildingResource.BuildableRadius);
+
+            _gridManager.HighlightResourceTiles(
+                _hoveredGridArea,
+                _toPlaceBuildingResource.ResourceRadius);
+
+            _buildingGhost.SetValid();
         }
 
-        _gridManager.HighlightPotentialTilesForBuildings(
-            _hoveredGridArea,
-            _toPlaceBuildingResource.BuildableRadius);
-
-        _gridManager.HighlightResourceTiles(
-            _hoveredGridArea,
-            _toPlaceBuildingResource.ResourceRadius);
-
-        _buildingGhost.SetValid();
+        _buildingGhost.DoHoverAnimation();
     }
 
     private void UpdateHoveredGridArea()
