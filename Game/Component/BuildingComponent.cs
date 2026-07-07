@@ -11,6 +11,9 @@ public partial class BuildingComponent : Node2D
 {
     private readonly HashSet<Vector2I> _occupiedTiles = [];
 
+    [Export]
+    private BuildingAnimatorComponent? _buildingAnimatorComponent;
+
     [Export(PropertyHint.File, "*.tres")]
     private string _buildingResourcePath = null!;
 
@@ -21,8 +24,9 @@ public partial class BuildingComponent : Node2D
         Debug.Assert(_buildingResourcePath != null,
             "BuildingResourcePath export variable not set in BuildingComponent.tscn");
 
-        if (_buildingResourcePath != null)
-            BuildingResource = GD.Load<BuildingResource>(_buildingResourcePath);
+        BuildingResource = GD.Load<BuildingResource>(_buildingResourcePath);
+
+        _buildingAnimatorComponent?.DestroyedAnimationFinished += OnDestroyAnimationFinished;
 
         AddToGroup(nameof(BuildingComponent));
 
@@ -34,7 +38,9 @@ public partial class BuildingComponent : Node2D
     public void Destroy()
     {
         GameEvents.EmitBuildingDestroyed(this);
-        Owner.QueueFree();
+        _buildingAnimatorComponent?.PlayDestroyAnimation();
+
+        if (_buildingAnimatorComponent == null) Owner.QueueFree();
     }
 
     public Vector2I GetGridCellPosition()
@@ -61,5 +67,10 @@ public partial class BuildingComponent : Node2D
     {
         CalculateOccupiedCellPositions();
         GameEvents.EmitBuildingPlaced(this);
+    }
+
+    private void OnDestroyAnimationFinished()
+    {
+        Owner.QueueFree();
     }
 }

@@ -5,6 +5,7 @@ using PuzzleCourse.Game.Building;
 using PuzzleCourse.Game.Component;
 using PuzzleCourse.Game.UI;
 using PuzzleCourse.Resources.Building;
+using PuzzleCourse.Scripts;
 
 namespace PuzzleCourse.Game.Manager;
 
@@ -37,6 +38,7 @@ public partial class BuildingManager : Node
     [Export]
     private GridManager _gridManager = null!;
 
+
     private Rect2I _hoveredGridArea = new(Vector2I.Zero, Vector2I.One);
 
     private int _startingResourceCount;
@@ -45,6 +47,7 @@ public partial class BuildingManager : Node
 
     [Export]
     private Node2D _ySortRoot = null!;
+
 
     private int AvailableResourceCount => _startingResourceCount + _currentResourceCount - _currentlyUsedResourceCount;
 
@@ -204,9 +207,10 @@ public partial class BuildingManager : Node
         Debug.Assert(_toPlaceBuildingResource != null);
 
         var building = _toPlaceBuildingResource.BuildingScene.Instantiate<Node2D>();
-        building.GlobalPosition = _hoveredGridArea.Position * Grid.CellPixelSize;
-
         _ySortRoot.AddChild(building);
+
+        building.GlobalPosition = _hoveredGridArea.Position * Grid.CellPixelSize;
+        building.FindFirstNode<BuildingAnimatorComponent>()?.PlayInAnimation();
 
         _currentlyUsedResourceCount += _toPlaceBuildingResource.ResourceCost;
 
