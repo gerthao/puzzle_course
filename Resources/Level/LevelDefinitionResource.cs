@@ -6,11 +6,11 @@ namespace PuzzleCourse.Resources.Level;
 public partial class LevelDefinitionResource : Resource
 {
     [Export]
-    public string Id { get; private set; }
+    public string Id { get; private set; } = null!;
 
     [Export]
     public int StartingResourceCount { get; private set; } = 4;
 
     [Export(PropertyHint.File, "*.tscn")]
-    public string LevelScenePath { get; private set; }
+    public string LevelScenePath { get; private set; } = null!;
 }

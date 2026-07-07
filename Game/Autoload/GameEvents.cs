@@ -11,7 +11,7 @@ public partial class GameEvents : Node
     [Signal]
     public delegate void BuildingPlacedEventHandler(BuildingComponent component);
 
-    public static GameEvents Instance { get; private set; }
+    public static GameEvents Instance { get; private set; } = null!;
 
     public override void _Notification(int what)
     {

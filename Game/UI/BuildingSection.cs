@@ -8,26 +8,26 @@ public partial class BuildingSection : PanelContainer
     [Signal]
     public delegate void SelectButtonPressedEventHandler();
 
-    private Label _costLabel;
-    private Label _descriptionLabel;
-    private Button _selectButton;
-    private Label _titleLabel;
+    private Label _costLabel = null!;
+    private Label _descriptionLabel = null!;
+    private Button _selectButton = null!;
+    private Label _titleLabel = null!;
 
     public override void _Ready()
     {
-        _titleLabel       = GetNode<Label>("%TitleLabel");
+        _titleLabel = GetNode<Label>("%TitleLabel");
         _descriptionLabel = GetNode<Label>("%DescriptionLabel");
-        _costLabel        = GetNode<Label>("%CostLabel");
-        _selectButton     = GetNode<Button>("%Button");
+        _costLabel = GetNode<Label>("%CostLabel");
+        _selectButton = GetNode<Button>("%Button");
 
         _selectButton.Pressed += OnSelectButtonPressed;
     }
 
     public void SetBuildingResource(BuildingResource buildingResource)
     {
-        _titleLabel.Text       = buildingResource.DisplayName;
+        _titleLabel.Text = buildingResource.DisplayName;
         _descriptionLabel.Text = buildingResource.Description;
-        _costLabel.Text        = buildingResource.ResourceCost.ToString();
+        _costLabel.Text = buildingResource.ResourceCost.ToString();
     }
 
     private void OnSelectButtonPressed() => EmitSignalSelectButtonPressed();

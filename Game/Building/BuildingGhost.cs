@@ -4,13 +4,13 @@ namespace PuzzleCourse.Game.Building;
 
 public partial class BuildingGhost : Node2D
 {
-    private Node2D _bottomLeft;
-    private Node2D _bottomRight;
-    private Node2D _spriteRoot;
-    private Tween _spriteTween;
-    private Node2D _topLeft;
-    private Node2D _topRight;
-    private Node2D _upDownRoot;
+    private Node2D _bottomLeft = null!;
+    private Node2D _bottomRight = null!;
+    private Node2D _spriteRoot = null!;
+    private Tween _spriteTween = null!;
+    private Node2D _topLeft = null!;
+    private Node2D _topRight = null!;
+    private Node2D _upDownRoot = null!;
 
     public override void _Ready()
     {

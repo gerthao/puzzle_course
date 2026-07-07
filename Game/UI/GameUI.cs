@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Godot;
 using PuzzleCourse.Game.Manager;
 using PuzzleCourse.Resources.Building;
@@ -10,22 +11,27 @@ public partial class GameUI : CanvasLayer
     public delegate void BuildingResourceSelectedEventHandler(BuildingResource resource);
 
     [Export]
-    private BuildingManager _buildingManager;
+    private BuildingManager _buildingManager = null!;
 
     [Export]
-    private BuildingResource[] _buildingResources;
+    private BuildingResource[] _buildingResources = null!;
 
     [Export]
-    private PackedScene _buildingSectionScene;
+    private PackedScene _buildingSectionScene = null!;
 
-    private VBoxContainer _hBoxContainer;
+    private VBoxContainer _hBoxContainer = null!;
 
-    private Label _resourceLabel;
+    private Label _resourceLabel = null!;
 
     public override void _Ready()
     {
-        _hBoxContainer                                 =  GetNode<VBoxContainer>("%BuildingSectionContainer");
-        _resourceLabel                                 =  GetNode<Label>("%ResourceLabel");
+        Debug.Assert(_buildingManager != null, "BuildingManager export variable not set in GameUI.tscn");
+        Debug.Assert(_buildingResources != null, "BuildingResources export variable not set in GameUI.tscn");
+        Debug.Assert(_buildingSectionScene != null, "BuildingSectionScene export variable not set in GameUI.tscn");
+
+        _hBoxContainer = GetNode<VBoxContainer>("%BuildingSectionContainer");
+        _resourceLabel = GetNode<Label>("%ResourceLabel");
+
         _buildingManager.AvailableResourceCountUpdated += OnAvailableResourceCountChanged;
 
         InitializeBuildingSections();

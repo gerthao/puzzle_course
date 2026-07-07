@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Godot;
 using PuzzleCourse.Game.Manager;
 using PuzzleCourse.Game.UI;
@@ -7,22 +8,26 @@ namespace PuzzleCourse.Game.Level;
 
 public partial class BaseLevel : Node
 {
-    private Node2D _baseBuilding;
-    private TileMapLayer _baseTerrainTileMapLayer;
-    private BuildingManager _buildingManager;
-    private GameCamera _gameCamera;
-    private GameUI _gameUI;
-    private GoldMine _goldMine;
-    private GridManager _gridManager;
+    private Node2D _baseBuilding = null!;
+    private TileMapLayer _baseTerrainTileMapLayer = null!;
+    private BuildingManager _buildingManager = null!;
+    private GameCamera _gameCamera = null!;
+    private GameUI _gameUI = null!;
+    private GoldMine _goldMine = null!;
+    private GridManager _gridManager = null!;
 
     [Export]
-    private PackedScene _levelCompleteScreen;
+    private PackedScene _levelCompleteScreen = null!;
 
     [Export]
-    private LevelDefinitionResource _levelDefinitionResource;
+    private LevelDefinitionResource _levelDefinitionResource = null!;
 
     public override void _Ready()
     {
+        Debug.Assert(_levelCompleteScreen != null, "LevelCompleteScreen export variable not set in BaseLevel.tscn");
+        Debug.Assert(_levelDefinitionResource != null,
+            "LevelDefinitionResource export variable not set in BaseLevel.tscn");
+
         _baseTerrainTileMapLayer = GetNode<TileMapLayer>("%BaseTerrainTileMapLayer");
         _gameCamera = GetNode<GameCamera>("GameCamera");
         _gridManager = GetNode<GridManager>("GridManager");

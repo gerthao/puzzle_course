@@ -4,11 +4,11 @@ namespace PuzzleCourse.Game.UI;
 
 public partial class MainMenu : Node
 {
-    private LevelSelectScreen _levelSelectScreen;
-    private Control _mainMenuContainer;
-    private Button _optionsButton;
-    private Button _playButton;
-    private Button _quitButton;
+    private LevelSelectScreen _levelSelectScreen = null!;
+    private Control _mainMenuContainer = null!;
+    private Button _optionsButton = null!;
+    private Button _playButton = null!;
+    private Button _quitButton = null!;
 
 
     public override void _Ready()

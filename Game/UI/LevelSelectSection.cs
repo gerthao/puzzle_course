@@ -8,10 +8,10 @@ public partial class LevelSelectSection : PanelContainer
     [Signal]
     public delegate void LevelSelectedEventHandler(int levelIndex);
 
-    private Button _button;
+    private Button _button = null!;
     private int _levelIndex;
-    private Label _levelNumberLabel;
-    private Label _resourceCountLabel;
+    private Label _levelNumberLabel = null!;
+    private Label _resourceCountLabel = null!;
 
     public override void _Ready()
     {

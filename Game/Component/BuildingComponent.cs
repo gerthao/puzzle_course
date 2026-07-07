@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Godot;
 using PuzzleCourse.Game.Autoload;
@@ -8,15 +9,18 @@ namespace PuzzleCourse.Game.Component;
 
 public partial class BuildingComponent : Node2D
 {
-    private readonly HashSet<Vector2I> _occupiedTiles = new();
+    private readonly HashSet<Vector2I> _occupiedTiles = [];
 
     [Export(PropertyHint.File, "*.tres")]
-    private string _buildingResourcePath;
+    private string _buildingResourcePath = null!;
 
-    public BuildingResource BuildingResource { get; private set; }
+    public BuildingResource BuildingResource { get; private set; } = null!;
 
     public override void _Ready()
     {
+        Debug.Assert(_buildingResourcePath != null,
+            "BuildingResourcePath export variable not set in BuildingComponent.tscn");
+
         if (_buildingResourcePath != null)
             BuildingResource = GD.Load<BuildingResource>(_buildingResourcePath);
 

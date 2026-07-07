@@ -6,10 +6,10 @@ namespace PuzzleCourse.Resources.Building;
 public partial class BuildingResource : Resource
 {
     [Export]
-    public string DisplayName { get; private set; }
+    public string DisplayName { get; private set; } = null!;
 
     [Export]
-    public string Description { get; private set; }
+    public string Description { get; private set; } = null!;
 
     [Export]
     public Vector2I Dimensions { get; private set; } = Vector2I.One;
@@ -27,8 +27,8 @@ public partial class BuildingResource : Resource
     public int ResourceRadius { get; private set; }
 
     [Export]
-    public PackedScene BuildingScene { get; private set; }
+    public PackedScene BuildingScene { get; private set; } = null!;
 
     [Export]
-    public PackedScene SpriteScene { get; private set; }
+    public PackedScene SpriteScene { get; private set; } = null!;
 }

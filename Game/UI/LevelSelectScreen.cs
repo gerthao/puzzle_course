@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Godot;
 using PuzzleCourse.Game.Autoload;
 
@@ -8,14 +9,17 @@ public partial class LevelSelectScreen : MarginContainer
     [Signal]
     public delegate void BackPressedEventHandler();
 
-    private Button _backButton;
-    private GridContainer _gridContainer;
+    private Button _backButton = null!;
+    private GridContainer _gridContainer = null!;
 
     [Export]
-    private PackedScene _levelSelectSectionScene;
+    private PackedScene _levelSelectSectionScene = null!;
 
     public override void _Ready()
     {
+        Debug.Assert(_levelSelectSectionScene != null,
+            "LevelSelectSection export variable not set in LevelSelectScreen.tscn");
+
         _gridContainer = GetNode<GridContainer>("%GridContainer");
         _backButton = GetNode<Button>("%BackButton");
 

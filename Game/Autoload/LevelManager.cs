@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Linq;
 using Godot;
 using PuzzleCourse.Resources.Level;
@@ -9,13 +10,18 @@ public partial class LevelManager : Node
     private int _currentLevelIndex;
 
     [Export]
-    private LevelDefinitionResource[] _levelDefinitions;
+    private LevelDefinitionResource[] _levelDefinitions = null!;
 
-    public static LevelManager Instance { get; private set; }
+    public static LevelManager Instance { get; private set; } = null!;
 
     public override void _Notification(int what)
     {
         if (what == NotificationSceneInstantiated) Instance = this;
+    }
+
+    public override void _Ready()
+    {
+        Debug.Assert(_levelDefinitions != null, "LevelDefinitions export variable not set in LevelManager.tscn");
     }
 
     public void ChangeToLevel(int levelIndex)

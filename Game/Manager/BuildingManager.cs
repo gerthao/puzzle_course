@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Linq;
 using Godot;
 using PuzzleCourse.Game.Building;
@@ -18,10 +19,12 @@ public partial class BuildingManager : Node
 
     private readonly StringName _actionRightClick = "right_click";
 
-    private BuildingGhost _buildingGhost;
+    private BuildingGhost? _buildingGhost;
+
+    private Vector2I? _buildingGhostDimensions;
 
     [Export]
-    private PackedScene _buildingGhostScene;
+    private PackedScene _buildingGhostScene = null!;
 
     private int _currentlyUsedResourceCount;
     private int _currentResourceCount;
@@ -29,19 +32,19 @@ public partial class BuildingManager : Node
     private State _currentState = State.Normal;
 
     [Export]
-    private GameUI _gameUI;
+    private GameUI _gameUI = null!;
 
     [Export]
-    private GridManager _gridManager;
+    private GridManager _gridManager = null!;
 
     private Rect2I _hoveredGridArea = new(Vector2I.Zero, Vector2I.One);
 
     private int _startingResourceCount;
 
-    private BuildingResource _toPlaceBuildingResource;
+    private BuildingResource? _toPlaceBuildingResource;
 
     [Export]
-    private Node2D _ySortRoot;
+    private Node2D _ySortRoot = null!;
 
     private int AvailableResourceCount => _startingResourceCount + _currentResourceCount - _currentlyUsedResourceCount;
 
@@ -53,13 +56,18 @@ public partial class BuildingManager : Node
 
     public override void _Process(double delta)
     {
-        var mouseGridPosition = _gridManager.GetMouseGridCellPosition();
+        Vector2I mouseGridPosition;
+
         switch (_currentState)
         {
-            case State.Normal:
-                break;
-            case State.PlacingBuilding:
+            case State.PlacingBuilding when _buildingGhost != null && _buildingGhostDimensions != null:
+                mouseGridPosition =
+                    _gridManager.GetMouseGetCellPositionWithDimensionOffset(_buildingGhostDimensions.Value);
                 _buildingGhost.Position = mouseGridPosition * Grid.CellPixelSize;
+                break;
+            case State.Normal:
+            default:
+                mouseGridPosition = _gridManager.GetMouseGridCellPosition();
                 break;
         }
 
@@ -72,6 +80,11 @@ public partial class BuildingManager : Node
 
     public override void _Ready()
     {
+        Debug.Assert(_ySortRoot != null, "YSortRoot export variable not set in BuildingManager.tscn");
+        Debug.Assert(_gameUI != null, "GameUI export variable not set in BuildingManager.tscn");
+        Debug.Assert(_gridManager != null, "GridManager export variable not set in BuildingManager.tscn");
+        Debug.Assert(_buildingGhostScene != null, "BuildingGhostScene export variable not set in BuildingManager.tscn");
+
         _gameUI.BuildingResourceSelected += OnPlaceBuildingResourceSelected;
         _gridManager.ResourceTilesUpdated += OnResourceTilesUpdated;
 
@@ -156,6 +169,8 @@ public partial class BuildingManager : Node
 
     private bool IsBuildingPlaceableAtArea(Rect2I tileArea)
     {
+        Debug.Assert(_toPlaceBuildingResource != null);
+
         var allTilesBuildable = _gridManager.IsTileAreaBuildable(tileArea);
 
         return allTilesBuildable
@@ -170,8 +185,9 @@ public partial class BuildingManager : Node
         ChangeState(State.PlacingBuilding);
         _hoveredGridArea.Size = resource.Dimensions;
         var buildingSprite = resource.SpriteScene.Instantiate<Sprite2D>();
-        _buildingGhost.AddSpriteNode(buildingSprite);
-        _buildingGhost.SetDimensions(resource.Dimensions);
+        _buildingGhost?.AddSpriteNode(buildingSprite);
+        _buildingGhost?.SetDimensions(resource.Dimensions);
+        _buildingGhostDimensions = resource.Dimensions;
         _toPlaceBuildingResource = resource;
         UpdateGridDisplay();
     }
@@ -185,6 +201,8 @@ public partial class BuildingManager : Node
 
     private void PlaceBuildingAtHoveredCellPosition()
     {
+        Debug.Assert(_toPlaceBuildingResource != null);
+
         var building = _toPlaceBuildingResource.BuildingScene.Instantiate<Node2D>();
         building.GlobalPosition = _hoveredGridArea.Position * Grid.CellPixelSize;
 
@@ -198,6 +216,10 @@ public partial class BuildingManager : Node
 
     private void UpdateGridDisplay()
     {
+        Debug.Assert(_buildingGhost != null);
+        Debug.Assert(_toPlaceBuildingResource != null);
+        Debug.Assert(_gridManager != null);
+
         _gridManager.ClearHighlightTileMapLayer();
         _gridManager.HighlightBuildRadiusOfOccupiedTiles();
 
