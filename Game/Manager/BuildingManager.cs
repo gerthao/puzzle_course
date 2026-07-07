@@ -210,7 +210,7 @@ public partial class BuildingManager : Node
         _ySortRoot.AddChild(building);
 
         building.GlobalPosition = _hoveredGridArea.Position * Grid.CellPixelSize;
-        building.FindFirstNode<BuildingAnimatorComponent>()?.PlayInAnimation();
+        building.FindFirstNodeOfType<BuildingAnimatorComponent>()?.PlayInAnimation();
 
         _currentlyUsedResourceCount += _toPlaceBuildingResource.ResourceCost;
 

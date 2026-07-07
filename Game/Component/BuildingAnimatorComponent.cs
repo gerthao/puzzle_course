@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Godot;
 
 namespace PuzzleCourse.Game.Component;
@@ -10,9 +11,16 @@ public partial class BuildingAnimatorComponent : Node2D
     private Tween? _activeTween;
     private Node2D? _animationRootNode;
 
+    private Sprite2D _maskNode = null!;
+
+    [Export]
+    private Texture2D _maskTexture = null!;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        Debug.Assert(_maskTexture != null, "MaskTexture export variable not set in BuildingAnimatorComponent.tscn");
+
         SetUpNodes();
     }
 
@@ -21,6 +29,9 @@ public partial class BuildingAnimatorComponent : Node2D
         if (_animationRootNode == null) return;
 
         if (_activeTween != null && _activeTween.IsValid()) _activeTween.Kill();
+
+        _maskNode.ClipChildren = ClipChildrenMode.Only;
+        _maskNode.Texture = _maskTexture;
 
         _activeTween = CreateTween();
 
@@ -71,8 +82,17 @@ public partial class BuildingAnimatorComponent : Node2D
         RemoveChild(spriteNode);
 
         Position = new Vector2(spriteNode.Position.X, spriteNode.Position.Y);
+
+        _maskNode = new Sprite2D
+        {
+            Centered = false,
+            Offset = new Vector2(-160, -256),
+        };
+
+        AddChild(_maskNode);
+
         _animationRootNode = new Node2D();
-        AddChild(_animationRootNode);
+        _maskNode.AddChild(_animationRootNode);
         _animationRootNode.AddChild(spriteNode);
 
         spriteNode.Position = Vector2.Zero;
