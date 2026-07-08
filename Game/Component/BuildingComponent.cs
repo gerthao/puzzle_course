@@ -17,6 +17,8 @@ public partial class BuildingComponent : Node2D
     [Export(PropertyHint.File, "*.tres")]
     private string _buildingResourcePath = null!;
 
+    public bool IsDestroying { get; private set; }
+
     public BuildingResource BuildingResource { get; private set; } = null!;
 
     public override void _Ready()
@@ -37,6 +39,8 @@ public partial class BuildingComponent : Node2D
 
     public void Destroy()
     {
+        IsDestroying = true;
+
         GameEvents.EmitBuildingDestroyed(this);
         _buildingAnimatorComponent?.PlayDestroyAnimation();
 
@@ -51,6 +55,12 @@ public partial class BuildingComponent : Node2D
     }
 
     public HashSet<Vector2I> GetOccupiedCellPositions() => _occupiedTiles.ToHashSet();
+
+    public static IEnumerable<BuildingComponent> GetValidBuildingComponents(Node node) =>
+        node.GetTree()
+            .GetNodesInGroup(nameof(BuildingComponent))
+            .Cast<BuildingComponent>()
+            .Where(comp => !comp.IsDestroying);
 
     public bool IsTileInBuildingArea(Vector2I tilePosition) => _occupiedTiles.Contains(tilePosition);
 

@@ -285,7 +285,7 @@ public partial class GridManager : Node
 
     private void OnBuildingDestroyed(BuildingComponent component)
     {
-        RecalculateGrid(component);
+        RecalculateGrid();
     }
 
     private void OnBuildingPlaced(BuildingComponent component)
@@ -294,7 +294,7 @@ public partial class GridManager : Node
         UpdateCollectedResourceTiles(component);
     }
 
-    private void RecalculateGrid(BuildingComponent excludedComponent)
+    private void RecalculateGrid()
     {
         _occupiedTiles.Clear();
         _validBuildableTiles.Clear();
@@ -302,10 +302,7 @@ public partial class GridManager : Node
         _allTilesInBuildingRadius.Clear();
 
         var buildingComponents =
-            GetTree()
-                .GetNodesInGroup(nameof(BuildingComponent))
-                .Cast<BuildingComponent>()
-                .Where(bc => bc != excludedComponent);
+            BuildingComponent.GetValidBuildingComponents(this);
 
         foreach (var component in buildingComponents)
         {
