@@ -11,6 +11,9 @@ public partial class BuildingAnimatorComponent : Node2D
     private Tween? _activeTween;
     private Node2D? _animationRootNode;
 
+    [Export]
+    private PackedScene _impactParticlesScene = null!;
+
     private Sprite2D _maskNode = null!;
 
     [Export]
@@ -20,6 +23,8 @@ public partial class BuildingAnimatorComponent : Node2D
     public override void _Ready()
     {
         Debug.Assert(_maskTexture != null, "MaskTexture export variable not set in BuildingAnimatorComponent.tscn");
+        Debug.Assert(_impactParticlesScene != null,
+            "ImpactParticleScene export variable not set in BuildingAnimatorComponent.tscn");
 
         SetUpNodes();
     }
@@ -65,6 +70,8 @@ public partial class BuildingAnimatorComponent : Node2D
             .SetEase(Tween.EaseType.In)
             .From(Vector2.Up * 124);
 
+        _activeTween.TweenCallback(Callable.From(CreateImpactParticles));
+
         _activeTween
             .TweenProperty(_animationRootNode, "position", Vector2.Up * 16, 0.1)
             .SetTrans(Tween.TransitionType.Quad)
@@ -74,6 +81,13 @@ public partial class BuildingAnimatorComponent : Node2D
             .TweenProperty(_animationRootNode, "position", Vector2.Zero, 0.1)
             .SetTrans(Tween.TransitionType.Quad)
             .SetEase(Tween.EaseType.In);
+    }
+
+    private void CreateImpactParticles()
+    {
+        var impactParticles = _impactParticlesScene.Instantiate<Node2D>();
+        GetParent()?.AddChild(impactParticles);
+        impactParticles.GlobalPosition = GlobalPosition;
     }
 
     private void SetUpNodes()

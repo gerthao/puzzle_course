@@ -2,7 +2,9 @@
 
 [ext_resource type="Script" uid="uid://vv3cmd8k606b" path="res://Game/Component/BuildingAnimatorComponent.cs" id="1_xqufr"]
 [ext_resource type="Texture2D" uid="uid://c0ij2o4dm21kr" path="res://Assets/Buildings/BuildingMask.png" id="2_d1vra"]
+[ext_resource type="PackedScene" uid="uid://bsrjycr1mh0fj" path="res://Game/Effect/BuildingImpactParticles.tscn" id="2_qqswf"]
 
 [node name="BuildingAnimatorComponent" type="Node2D" unique_id=1646185809]
 script = ExtResource("1_xqufr")
+_impactParticlesScene = ExtResource("2_qqswf")
 _maskTexture = ExtResource("2_d1vra")
